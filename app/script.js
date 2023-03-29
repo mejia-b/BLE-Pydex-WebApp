@@ -1,8 +1,9 @@
 const deviceNameInput = document.getElementById('deviceNameInput');
+const stringToSend = document.getElementById('stringToSend');
 const connectButton = document.getElementById('connectButton');
 const connectionStatus = document.getElementById('connectionStatus');
-const connectedDevice ;
-const device ;
+var connectedDevice = null ;
+var device = null;
 connectButton.addEventListener('click',BLEManager);
 sendButton.addEventListener('click',sendBLEData);
 
@@ -48,7 +49,7 @@ async function sendBLEData(){
     const armPropDataCharacteristic = await armPropDataService.getCharacteristic("e0262760-08c2-11e1-9073-0e8ac72e0001");
     console.log(armPropDataCharacteristic);
     console.log("Characteristics discovered");
-    var uint8array = new TextEncoder().encode("edwin amaya");
+    var uint8array = new TextEncoder().encode(stringToSend.value);
     
     armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
     console.log("Value has been written");
