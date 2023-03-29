@@ -1,84 +1,176 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Edwin Fairchild">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>BLE-Pydex</title>
 
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Edwin Fairchild">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>WEB-BLE-Pydex</title>
 
-    
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
 
-    <!-- Bootstrap core CSS -->
-<link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
+
+  <!-- Bootstrap core CSS -->
+  <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
       }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-    </style>
-
+    }
+  </style>
+<!--https://www.w3schools.com/howto/howto_css_animate_buttons.asp-->
+<style>
+  .button {
+    border-radius: 8px;
+    background-color: #f4511e;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 18px;
+    padding: 0px;
+    width: 120px;
+    height: 40px;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin: 0px;
+  }
+  
+  .button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.2s;
+  }
+  
+  .button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.2s;
+   
+  }
+  
+  .button:hover span {
+    padding-right: 25px;
+   
+  }
+  
+  .button:hover span:after {
+    opacity: 1;
+    right: 0;
     
-    <!-- Custom styles for this template -->
-    <link href="styles.css" rel="stylesheet">
-  </head>
-  <body>
-    
+  }
+  .blue {background-color: #09c1fe;} /* Blue */
+  .red {background-color: #f44336;} /* Red */ 
+  .gray {background-color: #e7e7e7; color: black;} /* Gray */ 
+  .black {background-color: #555555;} /* Black */
+  .sendBinary {background-color: #32ccff; width: 140px;} /* Red */ 
+  </style>
+
+
+  <!-- Custom styles for this template -->
+  <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+
   <div class="col-lg-8 mx-auto p-3 py-md-5">
     <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
       <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg>
-        <span class="fs-4">BLE-Pydex</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img">
+          <title>Bootstrap</title>
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z"
+            fill="currentColor"></path>
+        </svg>
+        <span class="fs-4">WEB-BLE-Pydex</span>
       </a>
     </header>
     <main>
-      <!-- First Row -->
+      <!-- Device Name -->
       <div class="row">
-        <div class="col-10">
-          <input class="form-control" id="deviceNameInput" placeholder="Enter device name">
+        <div class="col-2">
+          <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
         </div>
         <div class="col-2">
-          <button type="button" id="controlButton" class="btn btn-primary">Connect</button>
+          <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
         </div>
       </div>
 
-      <!-- Second Row -->
+      <!-- Send data to ARM PROP -->
       <div class="row">
-        <div class="col-3 gy-4">
-          <h5>Connection Status</h5>
+        <div class="col-2 gy-4">
+          <input class="form-control" id="stringToSend" placeholder="String to send">
         </div>
-        <div class="col-9 gy-4">
-          <h5 id="connectionStatus">IDLE</h5>
+        <div class="col-2 gy-4">
+          <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
         </div>
       </div>
+
+      <!-- Send Binary and file chooser -->
+      <div class="row">
+        <div class="col-3 gy-4">
+          <input type="file" id="file-selector" >
+          <script>
+            const fileSelector = document.getElementById('file-selector');
+            fileSelector.addEventListener('change', (event) => {
+              const fileList = event.target.files;
+              logger(fileList);
+            });
+          </script>
+        </div>
+        <div class="col-2 gy-4">
+          <button class="button sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+        </div>
+      </div>
+
+      <!-- Connection status -->
+      <div class="row">
+        <div class="col-4 gy-4">
+          <h4 id="connectionStatus">Connection Status: IDLE</h4>
+        </div>
+      </div>
+
+      <!-- Log Area -->
+      <div class="row">
+        <div class="col-11 gy-4">
+          <h5>Logs</h5>
+        </div>
+        <textarea id='logArea' cols=20 rows=10 autofocus></textarea>
+      </div>
+
+
 
 
     </main>
 
-    
     <footer class="pt-5 my-5 text-muted border-top">
-      Created by the Bootstrap team &middot; &copy; 2021
+
+      Created by YO MOMMA & MY MOMMA &middot; &copy; 2023
     </footer>
   </div>
 
 
-  
+
 
 
   <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js"></script>   
-  </body>
+  <script src="script.js"></script>
+</body>
+
 </html>
