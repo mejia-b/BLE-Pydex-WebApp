@@ -32,6 +32,53 @@
     }
   </style>
 
+<style>
+  .button {
+    border-radius: 8px;
+    background-color: #f4511e;
+    border: none;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 18px;
+    padding: 0px;
+    width: 120px;
+    height: 40px;
+    transition: all 0.2s;
+    cursor: pointer;
+    margin: 0px;
+  }
+  
+  .button span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.2s;
+  }
+  
+  .button span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.2s;
+  }
+  
+  .button:hover span {
+    padding-right: 25px;
+  }
+  
+  .button:hover span:after {
+    opacity: 1;
+    right: 0;
+  }
+  .blue {background-color: #32ccff;} /* Blue */
+  .red {background-color: #f44336;} /* Red */ 
+  .gray {background-color: #e7e7e7; color: black;} /* Gray */ 
+  .black {background-color: #555555;} /* Black */
+  .sendBinary {background-color: #32ccff; width: 140px;} /* Red */ 
+  </style>
+
 
   <!-- Custom styles for this template -->
   <link href="styles.css" rel="stylesheet">
@@ -54,21 +101,21 @@
     <main>
       <!-- Device Name -->
       <div class="row">
-        <div class="col-10">
-          <input class="form-control" id="deviceNameInput" placeholder="Enter device name">
+        <div class="col-2">
+          <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
         </div>
         <div class="col-2">
-          <button type="button" id="connectButton" class="btn btn-primary">Connect</button>
+          <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
         </div>
       </div>
 
       <!-- Send data to ARM PROP -->
       <div class="row">
-        <div class="col-3 gy-4">
+        <div class="col-2 gy-4">
           <input class="form-control" id="stringToSend" placeholder="String to send">
         </div>
         <div class="col-2 gy-4">
-          <button type="button" id="sendButton" class="btn btn-primary">Send</button>
+          <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
         </div>
       </div>
 
@@ -85,7 +132,7 @@
           </script>
         </div>
         <div class="col-2 gy-4">
-          <button type="button" id="sendBinButton" class="btn btn-primary">Send Binary</button>
+          <button class="button sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
         </div>
       </div>
 
