@@ -62,9 +62,6 @@ async function BLEManager() {
     console.log(armPropDataCharacteristic);
     console.log('Characteristics discovered');
     // Enable notifications on ARMPropDataCharacteristic
-    // console.log('> Notifications started');
-    // armPropDataCharacteristic.addEventListener('characteristicvaluechanged',
-    //     handleNotifications);
     if (armPropDataCharacteristic.properties.notify) {
         console.log("Notifications supported");
         armPropDataCharacteristic.addEventListener("characteristicvaluechanged",handleNotifications);
@@ -103,12 +100,12 @@ function handleNotifications(event) {
     console.log("Notification received");
     let value = event.target.value;
     let a = [];
-    // Convert raw data bytes to hex values just for the sake of showing something.
-    // In the "real" world, you'd use data.getUint8, data.getUint16 or even
-    // TextDecoder to process raw data bytes.
+    
     for (let i = 0; i < value.byteLength; i++) {
-      a.push('0x' + ('00' + value.getUint8(i).toString(16)).slice(-2));
+        a.push(String.fromCharCode(value.getUint8(i)));
+        
     }
-    var dataReceived = new TextDecoder().decode(value);
-    console.log(value);
+    //joing using "" inplace of ","
+    console.log(a.join(''));
+
   }
