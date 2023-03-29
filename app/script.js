@@ -28,7 +28,7 @@ async function BLEManager() {
         });
 
         connectedDevice = await device.gatt.connect();
-        connectionStatus.textContent = 'CONNECTED';
+        connectionStatus.textContent = 'Connection Status: CONNECTED';
 
         // setTimeout(function () {
         //       armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
@@ -51,7 +51,7 @@ async function BLEManager() {
                 });
             }
         } catch (error) {
-            logger('Argh! ' + error);
+            loggerError(error);
         }
 
         // Discover ArmPropDataCharacteristic
@@ -71,23 +71,25 @@ async function BLEManager() {
         await armPropDataCharacteristic.startNotifications();
 
 
-    } catch {
+    } catch(error) {
+        loggerError(error);
         if (typeof device !== 'undefined') {
-            connectionStatus.textContent = 'CONNECTION FAILED';
+            connectionStatus.textContent = 'Connection Status: FAILED';
         } else {
-            connectionStatus.textContent = 'CANCELLED';
+            connectionStatus.textContent = 'Connection Status: CANCELLED';
         }
     }
 }
 
 async function sendBLEData() {
-    logger('Sending: ' + stringToSend.value);
+    logger('Sending: ');
+    loggerData(stringToSend.value);
     try{
         var uint8array = new TextEncoder().encode(stringToSend.value);
         armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
         logger('Value has been written');
     } catch(error){
-        logger('Error:' + error);
+        loggerError(error);
     }
 }
 
@@ -104,15 +106,24 @@ function getSupportedProperties(characteristic) {
 function handleNotifications_arm_prop_data(event) {
     let value = event.target.value;
     let a = [];
-
+    logger('ARM Prop Data Notification: ');
     for (let i = 0; i < value.byteLength; i++) {
         a.push(String.fromCharCode(value.getUint8(i)));
     }
     // joing using "" inplace of ","
-    logger('ARM Prop Data Notification: ' + a.join(''));
+    loggerData(a.join(''));
 }
 
+// this could be written better by giving an argument of type 'error' or 'data' etc.
 function logger(text) {
-    logArea.textContent += text + '\n';
+    logArea.textContent += '> ' + text + '\n';
+    logArea.scrollTop = logArea.scrollHeight;
+}
+function loggerError(text) {
+    logArea.textContent += '!!! ' + text + ' !!!' +  '\n';
+    logArea.scrollTop = logArea.scrollHeight;
+}
+function loggerData(text) {
+    logArea.textContent += '    ' + '[ ' + text + ' ]' + '\n';
     logArea.scrollTop = logArea.scrollHeight;
 }
