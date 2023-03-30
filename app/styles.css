@@ -18,12 +18,13 @@
   }
 
 
-.container{
+.f-container{
   display: flex;
+  /* border: dashed red; */
 }
 
-#flex-item{
-  width: 100%;
+#main-area{
+  flex-grow: 1;
 }
 
 
