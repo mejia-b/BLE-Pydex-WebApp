@@ -81,9 +81,8 @@
 
 <body>
   <div class="f-container">
-    
     <!-- SIDE BAR -->
-    <div id="sidebar" class="d-flex flex-column p-3 bg-light" style="width: 280px;">
+    <div id="sidebar" class="d-flex flex-column flex-shrink p-3 bg-light" style="width: 280px;">
       <!-- LOGO -->
       <a href="https://github.com/EdwinFairchild/BLE-PyDex" class="d-flex align-items-center text-dark text-decoration-none">
         <span class="fs-5">BLE-Pydex</span>
@@ -139,7 +138,7 @@
     </div>
     <!-- MAIN AREA -->
     <div id="main-area" class="col-lg-12 p-3">
-      <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+      <header class="d-flex align-items-center pb-3 mb-5">
       </header>
       <main>
         <!-- Device Name -->
@@ -165,6 +164,9 @@
         <!-- Send Binary and file chooser -->
         <div class="row">
           <div class="col-3 gy-4">
+            <label for="file-selector" class="button blue center">
+              Choose File
+            </label>
             <input type="file" id="file-selector" >
             <script>
               const fileSelector = document.getElementById('file-selector');
@@ -175,7 +177,7 @@
             </script>
           </div>
           <div class="col-2 gy-4">
-            <button class="button sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+            <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
           </div>
         </div>
 
@@ -188,21 +190,19 @@
 
 
         
-    <!-- Log Area -->
-    <div class="row">
-      <div class="col-9 gy-4">
-        <h5>Logs</h5>
-      </div>
-      <form action="">
-        <textarea id='logArea' cols="100" rows="10" autofocus></textarea>
-      </form>
-      
-    </div>
+        <!-- Log Area -->
+        <div class="row">
+          <div class="col-9 gy-4">
+            <h5>Logs</h5>
+          </div>
+          <form action="">
+            <textarea id='logArea' cols="100" rows="10" autofocus></textarea>
+          </form>
+        </div>
       </main>
 
-      <footer class="pt-5 my-5 text-muted border-top">
-
-        Created by YO MOMMA & MY MOMMA &middot; &copy; 2023
+      <footer class="pt-5 text-muted">
+       BLE-Pydex &middot; &copy; 2023
       </footer>
     </div>
   </div>
