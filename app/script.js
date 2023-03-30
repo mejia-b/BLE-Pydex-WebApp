@@ -3,11 +3,17 @@ const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSend');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
+const choseFileButton = document.getElementById('choseFileButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
 
-const fileInput = document.getElementById('file-selector');
+const input = document.createElement('input');
+input.type = 'file';
+input.addEventListener('change', function() {
+    reader.readAsArrayBuffer(this.files[0]);
+    logger("File loaded: " + this.files[0].name)
+  });
 const reader = new FileReader();
 //  GLOBAL objects
 var connectedDevice = null;
@@ -18,7 +24,7 @@ var armPropDataService = null;
 // Buttons
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
-
+choseFileButton.addEventListener('click', sendBin);
 // Calculate CRC32 on file when file is selected or changed
 reader.onload = function() {
     const arrayBuffer = reader.result;
@@ -33,10 +39,7 @@ reader.onload = function() {
     logger("CRC32: 0x" +  crc32Unsigned.toString(16).toUpperCase() );
   };
   
-  fileInput.addEventListener('change', function() {
-    reader.readAsArrayBuffer(this.files[0]);
-    logger("File loaded: " + this.files[0].name)
-  });
+  
 
 async function BLEManager() {
     connectionStatus.textContent = 'SEARCHING';
@@ -46,12 +49,15 @@ async function BLEManager() {
             //   filters: [{
             //     name: deviceNameInput.value,
             //   }],
-            //  optionalServices: ['e0262760-08c2-11e1-9073-0e8ac72e1001']
+            optionalServices: ['e0262760-08c2-11e1-9073-0e8ac72e1001']
         });
 
         connectedDevice = await device.gatt.connect();
         connectionStatus.textContent = 'Connection Status: CONNECTED';
-
+        logger('Connected to ' + device.name);
+        if (device.name == "OTAS") {
+            logger('OTAS supported');
+        }
         // setTimeout(function () {
         //       armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
         //       logger("Value has been written");
@@ -113,6 +119,12 @@ async function sendBLEData() {
     } catch(error){
         loggerError(error);
     }
+}
+
+async function sendBin() {
+    logger('Sending: ');
+    
+    input.click();
 }
 
 function getSupportedProperties(characteristic) {

@@ -210,18 +210,9 @@
 
         <!-- Send Binary and file chooser -->
         <div class="row">
-          <div class="col-3 gy-4">
-            <input type="file" id="file-selector">
-            <script>
-              const fileSelector = document.getElementById('file-selector');
-              fileSelector.addEventListener('change', (event) => {
-                const fileList = event.target.files;
-                logger(fileList[0].name);
-              });
-            </script>
-          </div>
+
           <div class="col-2 gy-4">
-            <button class="button sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+            <button class="button sendBinary" type="button" id="choseFileButton"><span>Choose File</span></button>
           </div>
         </div>
 
@@ -257,7 +248,7 @@
   <script src="script.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crc-32/1.2.2/crc32.min.js"
     integrity="sha512-wIFCkv9+5jtI8PJBBe+UcH7ltv2ML4EXicOQ3zIOhSo3zljjiUkTlHo3n/skt7sYd/IdETcdYw8beIRO0M7XIw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>">
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </body>
 
