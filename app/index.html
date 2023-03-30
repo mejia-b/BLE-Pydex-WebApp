@@ -10,10 +10,11 @@
   <title>WEB-BLE-Pydex</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
   <!-- Custom styles for this template -->
   <link href="styles.css" rel="stylesheet">
- 
+
   <style>
     .bd-placeholder-img {
       font-size: 1.125rem;
@@ -30,52 +31,75 @@
     }
 
     .button {
-    border-radius: 8px;
-    background-color: #f4511e;
-    border: none;
-    color: #FFFFFF;
-    text-align: center;
-    font-size: 18px;
-    padding: 0px;
-    width: 120px;
-    height: 40px;
-    transition: all 0.2s;
-    cursor: pointer;
-    margin: 0px;
-  }
-  
-  .button span {
-    cursor: pointer;
-    display: inline-block;
-    position: relative;
-    transition: 0.2s;
-  }
-  
-  .button span:after {
-    content: '\00bb';
-    position: absolute;
-    opacity: 0;
-    top: 0;
-    right: -20px;
-    transition: 0.2s;
-   
-  }
-  
-  .button:hover span {
-    padding-right: 25px;
-   
-  }
-  
-  .button:hover span:after {
-    opacity: 1;
-    right: 0;
-    
-  }
-  .blue {background-color: #09c1fe;} /* Blue */
-  .red {background-color: #f44336;} /* Red */ 
-  .gray {background-color: #e7e7e7; color: black;} /* Gray */ 
-  .black {background-color: #555555;} /* Black */
-  .sendBinary {background-color: #32ccff; width: 140px;} /* Red */ 
+      border-radius: 8px;
+      background-color: #f4511e;
+      border: none;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 18px;
+      padding: 0px;
+      width: 120px;
+      height: 40px;
+      transition: all 0.2s;
+      cursor: pointer;
+      margin: 0px;
+    }
+
+    .button span {
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      transition: 0.2s;
+    }
+
+    .button span:after {
+      content: '\00bb';
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      right: -20px;
+      transition: 0.2s;
+
+    }
+
+    .button:hover span {
+      padding-right: 25px;
+
+    }
+
+    .button:hover span:after {
+      opacity: 1;
+      right: 0;
+
+    }
+
+    .blue {
+      background-color: #09c1fe;
+    }
+
+    /* Blue */
+    .red {
+      background-color: #f44336;
+    }
+
+    /* Red */
+    .gray {
+      background-color: #e7e7e7;
+      color: black;
+    }
+
+    /* Gray */
+    .black {
+      background-color: #555555;
+    }
+
+    /* Black */
+    .sendBinary {
+      background-color: #32ccff;
+      width: 140px;
+    }
+
+    /* Red */
   </style>
 </head>
 
@@ -84,45 +108,58 @@
     <!-- SIDE BAR -->
     <div id="sidebar" class="d-flex flex-column p-3 bg-light" style="width: 280px;">
       <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
-        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
+        <svg class="bi me-2" width="40" height="32">
+          <use xlink:href="#bootstrap" />
+        </svg>
         <span class="fs-4">Sidebar</span>
       </a>
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
           <a href="#" class="nav-link active" aria-current="page">
-            <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"/></svg>
+            <svg class="bi me-2" width="16" height="16">
+              <use xlink:href="#home" />
+            </svg>
             Home
           </a>
         </li>
         <li>
           <a href="#" class="nav-link link-dark">
-            <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"/></svg>
+            <svg class="bi me-2" width="16" height="16">
+              <use xlink:href="#speedometer2" />
+            </svg>
             Dashboard
           </a>
         </li>
         <li>
           <a href="#" class="nav-link link-dark">
-            <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
+            <svg class="bi me-2" width="16" height="16">
+              <use xlink:href="#table" />
+            </svg>
             Orders
           </a>
         </li>
         <li>
           <a href="#" class="nav-link link-dark">
-            <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
+            <svg class="bi me-2" width="16" height="16">
+              <use xlink:href="#grid" />
+            </svg>
             Products
           </a>
         </li>
         <li>
           <a href="#" class="nav-link link-dark">
-            <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
+            <svg class="bi me-2" width="16" height="16">
+              <use xlink:href="#people-circle" />
+            </svg>
             Customers
           </a>
         </li>
       </ul>
       <hr>
       <div class="dropdown">
-        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2"
+          data-bs-toggle="dropdown" aria-expanded="false">
           <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
           <strong>mdo</strong>
         </a>
@@ -130,7 +167,9 @@
           <li><a class="dropdown-item" href="#">New project...</a></li>
           <li><a class="dropdown-item" href="#">Settings</a></li>
           <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li><hr class="dropdown-divider"></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
           <li><a class="dropdown-item" href="#">Sign out</a></li>
         </ul>
       </div>
@@ -152,10 +191,10 @@
         <!-- Device Name -->
         <div class="row">
           <div class="col-2">
-            <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
+            <input class="form-control" id="deviceNameInput" placeholder="Enter device name">
           </div>
           <div class="col-2">
-            <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
+            <button class="button blue" type="button" id="connectButton"><span>Connect</span></button>
           </div>
         </div>
 
@@ -165,19 +204,19 @@
             <input class="form-control" id="stringToSend" placeholder="String to send">
           </div>
           <div class="col-2 gy-4">
-            <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
+            <button class="button blue" type="button" id="sendButton"><span>Send</span></button>
           </div>
         </div>
 
         <!-- Send Binary and file chooser -->
         <div class="row">
           <div class="col-3 gy-4">
-            <input type="file" id="file-selector" >
+            <input type="file" id="file-selector">
             <script>
               const fileSelector = document.getElementById('file-selector');
               fileSelector.addEventListener('change', (event) => {
                 const fileList = event.target.files;
-                logger(fileList);
+                logger(fileList[0].name);
               });
             </script>
           </div>
@@ -194,14 +233,14 @@
         </div>
 
 
-        
-    <!-- Log Area -->
-    <div class="row">
-      <div class="col-11 gy-4">
-        <h5>Logs</h5>
-      </div>
-      <textarea id='logArea' cols=20 rows=10 autofocus></textarea>
-    </div>
+
+        <!-- Log Area -->
+        <div class="row">
+          <div class="col-11 gy-4">
+            <h5>Logs</h5>
+          </div>
+          <textarea id='logArea' cols=20 rows=10 autofocus></textarea>
+        </div>
       </main>
 
       <footer class="pt-5 my-5 text-muted border-top">
@@ -216,6 +255,10 @@
 
   <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
   <script src="script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crc-32/1.2.2/crc32.min.js"
+    integrity="sha512-wIFCkv9+5jtI8PJBBe+UcH7ltv2ML4EXicOQ3zIOhSo3zljjiUkTlHo3n/skt7sYd/IdETcdYw8beIRO0M7XIw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>">
+
 </body>
 
 </html>

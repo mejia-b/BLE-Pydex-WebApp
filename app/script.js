@@ -6,6 +6,8 @@ const sendButton = document.getElementById('sendButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
 
+const fileInput = document.getElementById('file-selector');
+const reader = new FileReader();
 //  GLOBAL objects
 var connectedDevice = null;
 var device = null;
@@ -15,6 +17,19 @@ var armPropDataService = null;
 // Buttons
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
+
+// Calculate CRC32 on file when file is selected or changed
+reader.onload = function() {
+    const arrayBuffer = reader.result;
+    const crc32 = CRC32.buf(new Uint8Array(arrayBuffer));
+    // 32-bit unsigned integer from crc32
+    crc32Unsigned = crc32 >>> 0;
+    logger(crc32Unsigned);
+  };
+  
+  fileInput.addEventListener('change', function() {
+    reader.readAsArrayBuffer(this.files[0]);
+  });
 
 async function BLEManager() {
     connectionStatus.textContent = 'SEARCHING';
@@ -127,3 +142,4 @@ function loggerData(text) {
     logArea.textContent += '    ' + '[ ' + text + ' ]' + '\n';
     logArea.scrollTop = logArea.scrollHeight;
 }
+
