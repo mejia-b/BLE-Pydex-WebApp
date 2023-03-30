@@ -5,6 +5,7 @@ const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
+crc32bytes = new Uint8Array(4);
 
 const fileInput = document.getElementById('file-selector');
 const reader = new FileReader();
@@ -23,12 +24,18 @@ reader.onload = function() {
     const arrayBuffer = reader.result;
     const crc32 = CRC32.buf(new Uint8Array(arrayBuffer));
     // 32-bit unsigned integer from crc32
-    crc32Unsigned = crc32 >>> 0;
-    logger(crc32Unsigned);
+    const crc32Unsigned = crc32 >>> 0;
+    //store crc32 as 4 bytes
+    crc32bytes[0] = (crc32Unsigned & 0xff000000) >> 24;
+    crc32bytes[1] = (crc32Unsigned & 0x00ff0000) >> 16;
+    crc32bytes[2] = (crc32Unsigned & 0x0000ff00) >> 8;
+    crc32bytes[3] = (crc32Unsigned & 0x000000ff);
+    logger("CRC32: 0x" +  crc32Unsigned.toString(16).toUpperCase() );
   };
   
   fileInput.addEventListener('change', function() {
     reader.readAsArrayBuffer(this.files[0]);
+    logger("File loaded: " + this.files[0].name)
   });
 
 async function BLEManager() {
