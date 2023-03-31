@@ -1,4 +1,4 @@
-// HTML elements
+//---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSend');
 const connectButton = document.getElementById('connectButton');
@@ -8,6 +8,7 @@ const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
 
+//---------- File chooser ----------
 const input = document.createElement('input');
 input.type = 'file';
 input.addEventListener('change', function() {
@@ -15,16 +16,21 @@ input.addEventListener('change', function() {
     logger("File loaded: " + this.files[0].name)
   });
 const reader = new FileReader();
-//  GLOBAL objects
+
+//---------- BLE objects ----------
 var connectedDevice = null;
 var device = null;
 var armPropDataCharacteristic = null;
 var armPropDataService = null;
-
-// Buttons
+var wdxsService = null;
+//---------- Buttons ----------
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
 choseFileButton.addEventListener('click', sendBin);
+
+
+//---------- Functions ----------
+
 // Calculate CRC32 on file when file is selected or changed
 reader.onload = function() {
     const arrayBuffer = reader.result;
@@ -40,7 +46,7 @@ reader.onload = function() {
   };
   
   
-
+// Async function to connect to BLE device, discover services and characteristics
 async function BLEManager() {
     connectionStatus.textContent = 'SEARCHING';
     try {
@@ -49,54 +55,55 @@ async function BLEManager() {
             //   filters: [{
             //     name: deviceNameInput.value,
             //   }],
-            optionalServices: ['e0262760-08c2-11e1-9073-0e8ac72e1001']
+            //optionalServices: ['e0262760-08c2-11e1-9073-0e8ac72e1001', '0000fef6-0000-1000-8000-00805f9b34fb']
         });
 
         connectedDevice = await device.gatt.connect();
         connectionStatus.textContent = 'Connection Status: CONNECTED';
         logger('Connected to ' + device.name);
-        if (device.name == "OTAS") {
-            logger('OTAS supported');
-        }
-        // setTimeout(function () {
-        //       armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
-        //       logger("Value has been written");
-        // },5000);
-
+        
         try {
             logger('Getting Services...');
             const services = await connectedDevice.getPrimaryServices();
 
             logger('Getting Characteristics...');
             for (const service of services) {
-                logger('> Service: ' + service.uuid);
+                logger('Service: ' + service.uuid);
                 const characteristics = await service.getCharacteristics();
-
+                count = 0;
                 characteristics.forEach(characteristic => {
-                    logger(
-                        '>> Characteristic: ' + characteristic.uuid + ' ' +
+                    if(count == (characteristics.length - 1) ){
+                        logger('  └── Characteristic: ' + characteristic.uuid + ' ' +
                         getSupportedProperties(characteristic));
+                    }
+                    else{
+                    logger('  ├── Characteristic: ' + characteristic.uuid + ' ' +
+                        getSupportedProperties(characteristic));
+                    }
+                    count++;
+
                 });
             }
         } catch (error) {
             loggerError(error);
         }
 
-        // Discover ArmPropDataCharacteristic
-        armPropDataService = await connectedDevice.getPrimaryService(
-            'e0262760-08c2-11e1-9073-0e8ac72e1001');
-        logger('Services obtained');
-        armPropDataCharacteristic = await armPropDataService.getCharacteristic(
-            'e0262760-08c2-11e1-9073-0e8ac72e0001');
-        logger(armPropDataCharacteristic);
-        logger('Characteristics discovered');
-        // Enable notifications on ARMPropDataCharacteristic
-        if (armPropDataCharacteristic.properties.notify) {
-            logger('Notifications supported');
-            armPropDataCharacteristic.addEventListener(
-                'characteristicvaluechanged', handleNotifications_arm_prop_data);
-        }
-        await armPropDataCharacteristic.startNotifications();
+        // // Discover ArmPropDataCharacteristic
+        // armPropDataService = await connectedDevice.getPrimaryService(
+        //     'e0262760-08c2-11e1-9073-0e8ac72e1001');
+        // logger('Services obtained');
+        // armPropDataCharacteristic = await armPropDataService.getCharacteristic(
+        //     'e0262760-08c2-11e1-9073-0e8ac72e0001');
+        // logger(armPropDataCharacteristic);
+        // logger('Characteristics discovered');
+        // // Enable notifications on ARMPropDataCharacteristic
+        // if (armPropDataCharacteristic.properties.notify) {
+        //     logger('Notifications supported');
+        //     armPropDataCharacteristic.addEventListener(
+        //         'characteristicvaluechanged', handleNotifications_arm_prop_data);
+        // }
+        // await armPropDataCharacteristic.startNotifications();
+        await checkIfConnectedToOTAS();
 
 
     } catch(error) {
@@ -146,6 +153,22 @@ function handleNotifications_arm_prop_data(event) {
     }
     // joing using "" inplace of ","
     loggerData(a.join(''));
+}
+
+async function checkIfConnectedToOTAS() {
+    if (device.name === 'OTAS') {
+        // check that WDXS services exists
+        // Discover ArmPropDataCharacteristic
+        wdxsService = await connectedDevice.getPrimaryService(
+            '0000fef6-0000-1000-8000-00805f9b34fb');
+        if(wdxsService){
+            logger('WDXS service found');
+        }
+        else{
+            logger('WDXS service not found');
+        }
+
+    } 
 }
 
 // this could be written better by giving an argument of type 'error' or 'data' etc.
