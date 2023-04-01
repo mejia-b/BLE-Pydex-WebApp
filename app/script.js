@@ -127,3 +127,5 @@ function loggerData(text) {
     logArea.textContent += '    ' + '[ ' + text + ' ]' + '\n';
     logArea.scrollTop = logArea.scrollHeight;
 }
+
+
