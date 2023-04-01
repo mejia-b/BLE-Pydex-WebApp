@@ -166,87 +166,77 @@
       </div>
     </div>
     <div class="s-item2 main-container" style="border:solid brown;">
-      <div style="height: 90px; background-color: lightgreen;">
+      <div class="mc-1" style=" background-color: lightgreen;">
         Div Spacers
       </div>
-      <div class="mt-container">
-        <!-- MAIN AREA -->
-        <div class="main mt-item1" style="width: 700px;">
-          <div id="main-area" class="col-lg-12 p-3">
-            <header class="d-flex align-items-center pb-3 mb-5">
-            </header>
-            <main>
-              <!-- Device Name -->
-              <div class="row">
-                <div class="col-9">
-                  <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
-                </div>
-                <div class="col-2">
-                  <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
-                </div>
-              </div>
-      
-              <!-- Send data to ARM PROP -->
-              <div class="row">
-                <div class="col-9 gy-4">
-                  <input class="form-control" id="stringToSendInput" placeholder="String to send">
-                </div>
-                <div class="col-2 gy-4">
-                  <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
-                </div>
-              </div>
-      
-              <!-- Send Binary and file chooser -->
-              <div class="row">
-                <div class="col-3 gy-4">
-                  <label for="file-selector" class="button blue center">
-                    Choose File
-                  </label>
-                  <input type="file" id="file-selector" >
-                  <script>
-                    const fileSelector = document.getElementById('file-selector');
-                    fileSelector.addEventListener('change', (event) => {
-                      const fileList = event.target.files;
-                      logger(fileList);
-                    });
-                  </script>
-                </div>
-                <div class="col-2 gy-4">
-                  <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
-                </div>
-              </div>
-      
-              <!-- Connection status -->
-              <div class="row">
-                <div class="col-4 gy-4">
-                  <h4 id="connectionStatus">Connection Status: IDLE</h4>
-                </div>
-              </div>
-      
-              <!-- Log Area -->
-              <div class="row">
-                <div class="col-9 gy-4">
-                  <h5>Logs</h5>
-                </div>
-              <div class="container-text">
-                  <div class="comment">
-                    <textarea class="textinput" autofocus></textarea>
+      <div class="mc-2">
+        <div class="ct-container">
+          <div class="one mt-item1" style="border: dashed hotpink;">
+          <!-- MAIN AREA -->
+          <div class="main" style="width: 700px;">
+            <div id="center-area" class="col-lg-12 p-3">
+              <main>
+                <!-- Device Name -->
+                <div class="row">
+                  <div class="col-9">
+                    <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
+                  </div>
+                  <div class="col-2">
+                    <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
                   </div>
                 </div>
-              </div>
-            </main>
-            <footer class="pt-5 text-muted">
-            BLE-Pydex &middot; &copy; 2023
-            </footer>
+        
+                <!-- Send data to ARM PROP -->
+                <div class="row">
+                  <div class="col-9 gy-4">
+                    <input class="form-control" id="stringToSendInput" placeholder="String to send">
+                  </div>
+                  <div class="col-2 gy-4">
+                    <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
+                  </div>
+                </div>
+        
+                <!-- Send Binary and file chooser -->
+                <div class="row">
+                  <div class="col-3 gy-4">
+                    <label for="file-selector" class="button blue center">
+                      Choose File
+                    </label>
+                    <input type="file" id="file-selector" >
+                    <script>
+                      const fileSelector = document.getElementById('file-selector');
+                      fileSelector.addEventListener('change', (event) => {
+                        const fileList = event.target.files;
+                        logger(fileList);
+                      });
+                    </script>
+                  </div>
+                  <div class="col-2 gy-4">
+                    <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+                  </div>
+                </div>
+        
+                <!-- Connection status -->
+                <div class="row">
+                  <div class="col-4 gy-4">
+                    <h4 id="connectionStatus">Connection Status: IDLE</h4>
+                  </div>
+                </div>
+        
+                <!-- Log Area -->
+                
+              </main>
+              <!-- <footer class="pt-5 text-muted">
+              BLE-Pydex &middot; &copy; 2023
+              </footer> -->
+            </div>
+          </div> 
+          <!-- End of Main Area -->
           </div>
-        </div> 
-        <!-- End of Main Area -->
-        <!-- Tree View -->
-        <div class="mt-item2">
-          <div class="pt-5" id="tree"></div>
+          <div class="two mt-item2" style="border: dashed olive;">
+            <div class="" id="tree"></div>
+          </div>
         </div>
-        </div>
-
     </div>
   </div>
  

@@ -20,15 +20,30 @@ html,body {
 }
 
 .main-container{
+  height: 100vh;
   display: flex;
   flex-direction: column;
   border: solid orange;
+  align-items: auto;
 }
 
-.mt-container{
-  flex-direction: row;
+.mc-1{
+  flex: .69;
+  border: solid red;
+
+}
+
+.mc-2{
+  flex: 6;
+  border: solid green;
+  
+}
+
+.ct-container{
   display: flex;
+  flex-direction: row;
   border: solid purple;
+  height: 100%;
 }
 
 .mt-item1{
@@ -39,15 +54,15 @@ html,body {
   flex:.5;
 }
 
-#main-area{
+/* #main-area{
   height: 100vh;
   flex-grow: 1;
-  /* border: dashed red; */
-}
+  /* border: dashed red; 
+} */
 
 #main-area > footer{
   position: sticky;
-  top: 100vh;
+  top: 100%;
   width: 100%;
   text-align: center;
 }
