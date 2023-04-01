@@ -16,7 +16,7 @@ html,body {
 }
 
 .s-item2{
-  flex:4;
+  flex:7;
 }
 
 .main-container{
@@ -32,15 +32,11 @@ html,body {
 }
 
 .mt-item1{
-  flex:5;
+  flex:6;
+  border: dotted hotpink;
 }
 .mt-item2{
-  flex:1;
-}
-
-#sidebar{
-  height: 100vh;
-  /* border: solid orange; */
+  flex:.5;
 }
 
 #main-area{
