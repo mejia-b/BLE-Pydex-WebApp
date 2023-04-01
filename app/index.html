@@ -11,6 +11,10 @@
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/starter-template/">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+  <link rel="stylesheet" href=".//simple-treeview//dist//treeview.vanilla.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://unpkg.com/simple-treeview/dist/treeview.bootstrap.css">
+  
   <!-- Custom styles for this template -->
   <link href="styles.css" rel="stylesheet">
  
@@ -105,9 +109,9 @@
 </svg>
 
 <body>
-  <div class="f-container"> 
+  <div class="outer-container"> 
     <!-- SIDE BAR -->
-    <div id="sidebar" class="d-flex flex-column flex-shrink p-3 bg-light" style="width: 280px;">
+    <div id="sidebar" class="s-item1 d-flex flex-column flex-shrink p-3 bg-light" style="width: 280px; border: solid green;">
       <!-- LOGO -->
       <a href="https://github.com/EdwinFairchild/BLE-PyDex" class="d-flex align-items-center text-dark text-decoration-none">
         <span class="fs-5">BLE-Pydex</span>
@@ -161,84 +165,127 @@
         </ul>
       </div>
     </div>
-    <!-- MAIN AREA -->
-    <div id="main-area" class="col-lg-12 p-3">
-      <header class="d-flex align-items-center pb-3 mb-5">
-      </header>
-      <main>
-        <!-- Device Name -->
-        <div class="row">
-          <div class="col-2">
-            <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
-          </div>
-          <div class="col-2">
-            <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
-          </div>
+    <div class="s-item2 main-container" style="border:solid brown;">
+      <div style="height: 90px; background-color: lightgreen;">
+        Div Spacers
+      </div>
+      <div class="mt-container">
+        <!-- MAIN AREA -->
+        <div class="main mt-item1" style="width: 600px;">
+          <div id="main-area" class="col-lg-12 p-3">
+          <header class="d-flex align-items-center pb-3 mb-5">
+          </header>
+          <main>
+            <!-- Device Name -->
+            <div class="row">
+              <div class="col-9">
+                <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
+              </div>
+              <div class="col-2">
+                <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
+              </div>
+            </div>
+    
+            <!-- Send data to ARM PROP -->
+            <div class="row">
+              <div class="col-9 gy-4">
+                <input class="form-control" id="stringToSendInput" placeholder="String to send">
+              </div>
+              <div class="col-2 gy-4">
+                <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
+              </div>
+            </div>
+    
+            <!-- Send Binary and file chooser -->
+            <div class="row">
+              <div class="col-3 gy-4">
+                <label for="file-selector" class="button blue center">
+                  Choose File
+                </label>
+                <input type="file" id="file-selector" >
+                <script>
+                  const fileSelector = document.getElementById('file-selector');
+                  fileSelector.addEventListener('change', (event) => {
+                    const fileList = event.target.files;
+                    logger(fileList);
+                  });
+                </script>
+              </div>
+              <div class="col-2 gy-4">
+                <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+              </div>
+            </div>
+    
+            <!-- Connection status -->
+            <div class="row">
+              <div class="col-4 gy-4">
+                <h4 id="connectionStatus">Connection Status: IDLE</h4>
+              </div>
+            </div>
+    
+            <!-- Log Area -->
+            <div class="row">
+              <div class="col-9 gy-4">
+                <h5>Logs</h5>
+              </div>
+             <div class="container-text">
+                <div class="comment">
+                  <textarea class="textinput" autofocus></textarea>
+                </div>
+              </div>
+            </div>
+          </main>
+    
+          <footer class="pt-5 text-muted">
+           BLE-Pydex &middot; &copy; 2023
+          </footer>
+        </div>
+        </div> 
+        <!-- Tree View -->
+        <div  class="mt-item2" id="tree" style="margin-top: 40px;"></div>
         </div>
 
-        <!-- Send data to ARM PROP -->
-        <div class="row">
-          <div class="col-2 gy-4">
-            <input class="form-control" id="stringToSend" placeholder="String to send">
-          </div>
-          <div class="col-2 gy-4">
-            <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
-          </div>
-        </div>
-
-        <!-- Send Binary and file chooser -->
-        <div class="row">
-          <div class="col-3 gy-4">
-            <label for="file-selector" class="button blue center">
-              Choose File
-            </label>
-            <input type="file" id="file-selector" >
-            <script>
-              const fileSelector = document.getElementById('file-selector');
-              fileSelector.addEventListener('change', (event) => {
-                const fileList = event.target.files;
-                logger(fileList);
-              });
-            </script>
-          </div>
-          <div class="col-2 gy-4">
-            <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
-          </div>
-        </div>
-
-        <!-- Connection status -->
-        <div class="row">
-          <div class="col-4 gy-4">
-            <h4 id="connectionStatus">Connection Status: IDLE</h4>
-          </div>
-        </div>
-
-
-        
-        <!-- Log Area -->
-        <div class="row">
-          <div class="col-9 gy-4">
-            <h5>Logs</h5>
-          </div>
-          <form action="">
-            <textarea id='logArea' cols="100" rows="10" autofocus></textarea>
-          </form>
-        </div>
-      </main>
-
-      <footer class="pt-5 text-muted">
-       BLE-Pydex &middot; &copy; 2023
-      </footer>
+      </div>
     </div>
-
-   
-  </div>
-
-
-
+ 
 
   <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
   <script src="script.js"></script>
+  <script type="module">
+    import { BootstrapTreeView } from 'https://unpkg.com/simple-treeview/dist/treeview.bootstrap.js';
+    let tree = new BootstrapTreeView(document.getElementById('tree'), {
+        provider: {
+            async getChildren(id) {
+                if (!id) {
+                    return [
+                        { id: 'p1', label: 'Parent #1', icon: { classes: ['bi', 'bi-folder'] }, state: 'collapsed' },
+                        { id: 'p2', label: 'Parent #2', icon: { classes: ['bi', 'bi-folder'] }, state: 'expanded' }
+                    ];
+                } else {
+                    await new Promise((resolve, reject) => setTimeout(resolve, 0));
+                    switch (id) {
+                        case 'p1':
+                            return [
+                                { id: 'c1', label: 'Child #1', icon: { classes: ['bi', 'bi-file-earmark'] }, state: 'collapsed' },
+                                { id: 'c2', label: 'Child #2', icon: { classes: ['bi', 'bi-file-earmark'] } }
+                            ];
+                        case 'p2':
+                            return [
+                                { id: 'c3', label: 'Child #3', icon: { classes: ['bi', 'bi-file-earmark'] } },
+                                { id: 'c4', label: 'Child #4', icon: { classes: ['bi', 'bi-file-earmark'] } }
+                            ];
+                        case 'c1':
+                            return [
+                                { id: 'g1', label: 'Grandchild #1', icon: { classes: ['bi', 'bi-clock'] } }
+                            ];
+                        default:
+                            return [];
+                    }
+                }
+            }
+        }
+    });
+</script>
 </body>
 
 </html>

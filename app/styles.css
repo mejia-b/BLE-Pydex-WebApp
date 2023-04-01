@@ -4,12 +4,38 @@ html,body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
 }
-.f-container{
+.outer-container{
+  flex-direction: row;
   margin: 0;
   padding-left: 10px;
   display: flex;
-  
-  /* border: solid black; */
+  border: dashed orange;
+}
+.s-item1{
+  flex:1;
+}
+
+.s-item2{
+  flex:4;
+}
+
+.main-container{
+  display: flex;
+  flex-direction: column;
+  border: solid orange;
+}
+
+.mt-container{
+  flex-direction: row;
+  display: flex;
+  border: solid purple;
+}
+
+.mt-item1{
+  flex:5;
+}
+.mt-item2{
+  flex:1;
 }
 
 #sidebar{
@@ -42,6 +68,36 @@ body{
 input[type="file"] {
   display: none;
 }
+
+/* Textarea */
+.container {
+  max-width: 820px;
+  margin: 0px auto;
+  margin-top: 50px;
+}
+
+.comment {
+  float: left;
+  width: 100%;
+  height: auto;
+}
+
+.comment-text-area {
+  float: left;
+  width: 80%;
+  height: auto;
+}
+
+.textinput {
+  float: left;
+  width: 100%;
+  min-height: 150px;
+  outline: none;
+  resize: none;
+  border: 1px solid grey;
+}
+
+
 
 
 
