@@ -4,6 +4,21 @@ html,body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
 }
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body{
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+input[type="file"] {
+  display: none;
+}
+
 .outer-container{
   flex-direction: row;
   margin: 0;
@@ -11,11 +26,11 @@ html,body {
   display: flex;
   border: dashed orange;
 }
-.s-item1{
+.outer-item1{
   flex:1;
 }
 
-.s-item2{
+.outer-item2{
   flex:7;
 }
 
@@ -48,10 +63,10 @@ html,body {
 
 .mt-item1{
   flex:6;
-  border: dotted hotpink;
+  border: dotted rgb(12, 5, 12);
 }
 .mt-item2{
-  flex:.5;
+  flex: 2;
 }
 
 /* #main-area{
@@ -65,19 +80,6 @@ html,body {
   top: 100%;
   width: 100%;
   text-align: center;
-}
-body::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-body{
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-input[type="file"] {
-  display: none;
 }
 
 /* Textarea */
@@ -107,6 +109,52 @@ input[type="file"] {
   resize: none;
   border: 1px solid grey;
 }
+
+.inputs-container{
+  display: flex;
+  flex-direction: row;
+  border: solid burlywood;
+}
+
+.inputs{
+  border: solid mediumslateblue;
+  padding-top: 30px;
+  padding-left: 30px;
+  flex:3;
+  height: 100%;
+}
+.tree{
+  flex: 1.8;
+}
+
+.inputs-log-container{
+  display:flex;
+  flex-direction: column;
+  height: 100%;
+  border: dashed darkred
+}
+
+.inlc-1{
+  height: 100%;
+  flex: 2;
+  border: dashed greenyellow;
+}
+
+.inlc-2{
+  height: 100%;
+  flex: 1.5;
+  border: solid red;
+}
+
+.footer{
+  flex: .1;
+  height: 100%;
+  border: solid hotpink;
+  text-align: center;
+ 
+}
+
+
 
 
 
