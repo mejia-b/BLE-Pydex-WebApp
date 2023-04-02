@@ -179,10 +179,11 @@
                       <!-- INPUT BOXES AND BUTTONS -->
                       <div class="inputs">
                         <!-- Device Name -->
-                        <div class="row deviceName">
-                          <div class="col-3">
+                        <div class="row">
+                          <div class="col-5">
                             <input  class="form-control" id="deviceNameInput" placeholder="Enter device name">
                           </div>
+                          <div class="col-1"></div>
                           <div class="col-2">
                             <button class="button blue"  type="button" id="connectButton" ><span>Connect</span></button>
                           </div>
@@ -190,9 +191,10 @@
                 
                         <!-- Send data to ARM PROP -->
                         <div class="row">
-                          <div class="col-3 gy-4">
+                          <div class="col-5 gy-4">
                             <input class="form-control" id="stringToSendInput" placeholder="String to send">
                           </div>
+                          <div class="col-1"></div>
                           <div class="col-2 gy-4">
                             <button class="button blue" type="button" id="sendButton" ><span>Send</span></button>
                           </div>
@@ -200,21 +202,12 @@
                 
                         <!-- Send Binary and file chooser -->
                         <div class="row">
-                          <div class="col-3 gy-4">
-                            <label for="file-selector" class="button blue center">
-                              Choose File
-                            </label>
-                            <input type="file" id="file-selector" >
-                            <script>
-                              const fileSelector = document.getElementById('file-selector');
-                              fileSelector.addEventListener('change', (event) => {
-                                const fileList = event.target.files;
-                                logger(fileList);
-                              });
-                            </script>
-                          </div>
+                          <div class="col-6"></div>
                           <div class="col-2 gy-4">
-                            <button class="button blue sendBinary" type="button" id="sendBinButton"><span>Send Binary</span></button>
+                            <label for="sendBinButton" class="button blue">
+                              <span>Send Binary</span>
+                            </label>
+                            <input type="file" id="sendBinButton"></input>
                           </div>
                         </div>
                 
