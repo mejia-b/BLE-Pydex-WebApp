@@ -13,7 +13,7 @@ fileBuffer = [];
 //---------- File chooser ----------
 const input = document.createElement('input');
 input.type = 'file';
-input.addEventListener('change', function () {
+input.addEventListener('change', function() {
   reader.readAsArrayBuffer(this.files[0]);
   // get file size
   fileSize = this.files[0].size;
@@ -121,7 +121,7 @@ sendPacket.addEventListener('click', sendPacketFunction);
 //---------- Functions ----------
 
 // Calculate CRC32 on file when file is selected or changed
-reader.onload = function () {
+reader.onload = function() {
   const buff = reader.result;
   const crc32 = CRC32.buf(new Uint8Array(buff));
   let bytes = new Uint8Array(buff);
@@ -169,12 +169,12 @@ async function BLEManager() {
         characteristics.forEach(characteristic => {
           if (count == (characteristics.length - 1)) {
             logger(
-              '  └── Characteristic: ' + characteristic.uuid + ' ' +
-              getSupportedProperties(characteristic));
+                '  └── Characteristic: ' + characteristic.uuid + ' ' +
+                getSupportedProperties(characteristic));
           } else {
             logger(
-              '  ├── Characteristic: ' + characteristic.uuid + ' ' +
-              getSupportedProperties(characteristic));
+                '  ├── Characteristic: ' + characteristic.uuid + ' ' +
+                getSupportedProperties(characteristic));
           }
           count++;
         });
@@ -212,7 +212,6 @@ async function sendBLEData() {
 }
 
 async function sendWdxsData(characteristic, data, response) {
-
   try {
     var uint8array = new TextEncoder().encode(stringToSend.value);
     if (response) {
@@ -257,42 +256,42 @@ async function checkIfConnectedToOTAS() {
   if (device.name === 'OTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
-      'e0262760-08c2-11e1-9073-0e8ac72e1001');
+        'e0262760-08c2-11e1-9073-0e8ac72e1001');
     // Discover ARMPropDataCharacteristic
     armPropDataCharacteristic = await armPropDataService.getCharacteristic(
-      'e0262760-08c2-11e1-9073-0e8ac72e0001');
+        'e0262760-08c2-11e1-9073-0e8ac72e0001');
 
 
     // Discover wdxs service and characteristics
     wdxsService = await connectedDevice.getPrimaryService(
-      '0000fef6-0000-1000-8000-00805f9b34fb');
+        '0000fef6-0000-1000-8000-00805f9b34fb');
     if (wdxsService) {
       logger('WDXS service found');
       // subscribe to all wdxs characteristics
       wdxsDeviceConfigCharacteristic = await wdxsService.getCharacteristic(
-        '005f0002-2ff2-4ed5-b045-4c7463617865');
+          '005f0002-2ff2-4ed5-b045-4c7463617865');
       wdxsFileTransferControlCharacteristic =
-        await wdxsService.getCharacteristic(
-          '005f0003-2ff2-4ed5-b045-4c7463617865');
+          await wdxsService.getCharacteristic(
+              '005f0003-2ff2-4ed5-b045-4c7463617865');
       wdxsFileTransferDataCharacteristic = await wdxsService.getCharacteristic(
-        '005f0004-2ff2-4ed5-b045-4c7463617865');
+          '005f0004-2ff2-4ed5-b045-4c7463617865');
       wdsxFileAuthenticationCharacteristic =
-        await wdxsService.getCharacteristic(
-          '005f0005-2ff2-4ed5-b045-4c7463617865');
+          await wdxsService.getCharacteristic(
+              '005f0005-2ff2-4ed5-b045-4c7463617865');
 
       // Enable notifications on ARMPropDataCharacteristic
       armPropDataCharacteristic.addEventListener(
-        'characteristicvaluechanged', handleNotifications_wdxs_otas);
+          'characteristicvaluechanged', handleNotifications_wdxs_otas);
 
       // Enable notifications on WDXS characteristics
       wdxsDeviceConfigCharacteristic.addEventListener(
-        'characteristicvaluechanged', handleNotifications_wdxs_otas);
+          'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdxsFileTransferControlCharacteristic.addEventListener(
-        'characteristicvaluechanged', handleNotifications_wdxs_otas);
+          'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdxsFileTransferDataCharacteristic.addEventListener(
-        'characteristicvaluechanged', handleNotifications_wdxs_otas);
+          'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdsxFileAuthenticationCharacteristic.addEventListener(
-        'characteristicvaluechanged', handleNotifications_wdxs_otas);
+          'characteristicvaluechanged', handleNotifications_wdxs_otas);
 
       await armPropDataCharacteristic.startNotifications();
       await wdxsDeviceConfigCharacteristic.startNotifications();
@@ -315,17 +314,21 @@ function logger(text) {
 }
 function loggerError(text) {
   logArea.textContent += '!!! ' + text + ' !!!' +
-    '\n';
+      '\n';
   logArea.scrollTop = logArea.scrollHeight;
 }
 function loggerData(text) {
   logArea.textContent += '    ' +
-    '[ ' + text + ' ]' +
-    '\n';
+      '[ ' + text + ' ]' +
+      '\n';
   logArea.scrollTop = logArea.scrollHeight;
 }
 
 function handleNotifications_wdxs_otas() {
+  if (EVENT_COUNTER == 2) {
+    logger('Chanigng state to OTAS_SEND_FILE_STATE ');
+    OTAS_CURRENT_STATE = OTAS_SEND_FILE_STATE;
+  }
   switch (OTAS_CURRENT_STATE) {
     case OTAS_IDLE_STATE:
       logger('OTAS_IDLE_STATE');
@@ -361,18 +364,12 @@ function handleNotifications_wdxs_otas() {
     case OTAS_ERASING_STATE:
       logger('OTAS_ERASING_STATE');
       EVENT_COUNTER++;
-      if (EVENT_COUNTER == 3) {
-        OTAS_CURRENT_STATE++;
-        handleNotifications_wdxs_otas();
-
-
-      }
       break;
 
     case OTAS_SEND_FILE_STATE:
       logger('OTAS_SEND_FILE_STATE');
       OTAS_CURRENT_STATE++;
-      sendFile();
+      // sendFile();
       break;
     case OTAS_UPDATE_IN_PROGRESS_STATE:
       logger('OTAS_UPDATE_IN_PROGRESS_STATE');
@@ -432,14 +429,13 @@ async function sendPutRequest() {
   val[0] = 1;
   val[1] = 0;
   let packetToSend = new Uint8Array(16);
-  packetToSend.set(WDX_FTC_OP_PUT_REQ, 0); // 1 byte
-  packetToSend.set(val, 1); // 2 bytes
-  packetToSend.set(WDX_FILE_OFFSET, 3); // 4 bytes
-  packetToSend.set(fileSize, 7); // 4 bytes
-  packetToSend.set(fileSize, 11); // 4 bytes
-  packetToSend.set(WDX_FILE_TYPE, 15); // 1 byte
+  packetToSend.set(WDX_FTC_OP_PUT_REQ, 0);  // 1 byte
+  packetToSend.set(val, 1);                 // 2 bytes
+  packetToSend.set(WDX_FILE_OFFSET, 3);     // 4 bytes
+  packetToSend.set(fileSize, 7);            // 4 bytes
+  packetToSend.set(fileSize, 11);           // 4 bytes
+  packetToSend.set(WDX_FILE_TYPE, 15);      // 1 byte
   await sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true);
-
 }
 
 async function sendFile() {
@@ -462,26 +458,29 @@ async function sendFile() {
   // send chunk of file starting at sendAddress
   let packetToSend = new Uint8Array(chunkSize + addressBytes.length);
   packetToSend.set(addressBytes, 0);
-  packetToSend.set(fileBuffer.slice(adrdressNum, adrdressNum + chunkSize), addressBytes.length);
+  packetToSend.set(
+      fileBuffer.slice(adrdressNum, adrdressNum + chunkSize),
+      addressBytes.length);
   sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, true);
   logger('Sent chunk of file to address' + adrdressNum);
 
   // while (adrdressNum < fileBuffer.length) {
   //   if (adrdressNum + chunkSize > fileSize) {
   //     // send remaining bytes
-  //     let packetToSend = new Uint8Array(fileSize - adrdressNum + addressBytes.length);
-  //     packetToSend.set(addressBytes, 0);
-  //     packetToSend.set(fileBuffer.slice(adrdressNum, fileSize), addressBytes.length);
-  //     sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, true);
-  //     logger('Sent last chunk of file to address' + adrdressNum);
-  //     OTAS_CURRENT_STATE = OTAS_SEND_VERIFY_REQ_STATE;
+  //     let packetToSend = new Uint8Array(fileSize - adrdressNum +
+  //     addressBytes.length); packetToSend.set(addressBytes, 0);
+  //     packetToSend.set(fileBuffer.slice(adrdressNum, fileSize),
+  //     addressBytes.length); sendWdxsData(wdxsFileTransferDataCharacteristic,
+  //     packetToSend, true); logger('Sent last chunk of file to address' +
+  //     adrdressNum); OTAS_CURRENT_STATE = OTAS_SEND_VERIFY_REQ_STATE;
   //     handleNotifications_wdxs_otas();
 
   //   } else {
   //     // send chunk of file starting at sendAddress
   //     let packetToSend = new Uint8Array(chunkSize + addressBytes.length);
   //     packetToSend.set(addressBytes, 0);
-  //     packetToSend.set(fileBuffer.slice(adrdressNum, adrdressNum + chunkSize), addressBytes.length);
+  //     packetToSend.set(fileBuffer.slice(adrdressNum, adrdressNum +
+  //     chunkSize), addressBytes.length);
   //     sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, true);
   //     logger('Sent chunk of file to address' + adrdressNum);
 
@@ -492,10 +491,9 @@ async function sendFile() {
   addressBytes[1] = (adrdressNum >> 8) & 0xff;
   addressBytes[2] = (adrdressNum >> 16) & 0xff;
   addressBytes[3] = (adrdressNum >> 24) & 0xff;
-
 }
 
-function sendPacketFunction() {
+async function sendPacketFunction() {
   logger('Sending packet');
   // send fileBuffer to WDX in chunks of 224 bytes
   var chunkSize = 224;
@@ -516,30 +514,12 @@ function sendPacketFunction() {
   // send chunk of file starting at sendAddress
   let packetToSend = new Uint8Array(chunkSize + addressBytes.length);
   packetToSend.set(addressBytes, 0);
-  packetToSend.set(fileBuffer.slice(adrdressNum, adrdressNum + chunkSize), addressBytes.length);
-  sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, false);
+  packetToSend.set(
+      fileBuffer.slice(adrdressNum, adrdressNum + chunkSize),
+      addressBytes.length);
+  await sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, false);
   logger('Sent chunk of file to address' + adrdressNum);
 
-  // while (adrdressNum < fileBuffer.length) {
-  //   if (adrdressNum + chunkSize > fileSize) {
-  //     // send remaining bytes
-  //     let packetToSend = new Uint8Array(fileSize - adrdressNum + addressBytes.length);
-  //     packetToSend.set(addressBytes, 0);
-  //     packetToSend.set(fileBuffer.slice(adrdressNum, fileSize), addressBytes.length);
-  //     sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, true);
-  //     logger('Sent last chunk of file to address' + adrdressNum);
-  //     OTAS_CURRENT_STATE = OTAS_SEND_VERIFY_REQ_STATE;
-  //     handleNotifications_wdxs_otas();
-
-  //   } else {
-  //     // send chunk of file starting at sendAddress
-  //     let packetToSend = new Uint8Array(chunkSize + addressBytes.length);
-  //     packetToSend.set(addressBytes, 0);
-  //     packetToSend.set(fileBuffer.slice(adrdressNum, adrdressNum + chunkSize), addressBytes.length);
-  //     sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, true);
-  //     logger('Sent chunk of file to address' + adrdressNum);
-
-  //   }
   adrdressNum += chunkSize;
   // set addressNum into addressBytes in little endian format
   addressBytes[0] = adrdressNum & 0xff;
