@@ -24,13 +24,14 @@ input[type="file"] {
   margin: 0;
   padding-left: 10px;
   display: flex;
-  border: dashed orange;
+  /* border: dashed orange; */
 }
 .outer-item1{
   flex:1;
 }
 
 .outer-item2{
+  /* border:solid brown; */
   flex:7;
 }
 
@@ -38,34 +39,36 @@ input[type="file"] {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  border: solid orange;
+  /* border: solid orange; */
   align-items: auto;
 }
 
 .mc-1{
+  /* background-color: lightgreen; */
   flex: .69;
-  border: solid red;
+  /* border: solid red; */
 
 }
 
 .mc-2{
   flex: 6;
-  border: solid green;
+  /* border: solid green; */
   
 }
 
 .ct-container{
   display: flex;
   flex-direction: row;
-  border: solid purple;
+  /* border: solid purple; */
   height: 100%;
 }
 
 .mt-item1{
   flex:6;
-  border: dotted rgb(12, 5, 12);
+  /* border: dotted rgb(12, 5, 12); */
 }
 .mt-item2{
+  /* border: dashed olive; */
   flex: 2;
 }
 
@@ -86,12 +89,13 @@ input[type="file"] {
   float: left;
   width: 80%;
   height: auto;
+  /* border: solid blue; */
 }
 
 .textinput {
   float: left;
   width: 100%;
-  min-height: 150px;
+  min-height: 200px;
   outline: none;
   resize: none;
   border: 1px solid grey;
@@ -100,11 +104,11 @@ input[type="file"] {
 .inputs-container{
   display: flex;
   flex-direction: row;
-  border: solid burlywood;
+  /* border: solid burlywood; */
 }
 
 .inputs{
-  border: solid mediumslateblue;
+  /* border: solid mediumslateblue; */
   padding-top: 30px;
   padding-left: 30px;
   flex:3;
@@ -118,25 +122,25 @@ input[type="file"] {
   display:flex;
   flex-direction: column;
   height: 100%;
-  border: dashed darkred
+  /* border: dashed darkred; */
 }
 
 .inlc-1{
   height: 100%;
   flex: 2;
-  border: dashed greenyellow;
+  /* border: dashed greenyellow; */
 }
 
 .inlc-2{
   height: 100%;
-  flex: 1.5;
-  border: solid red;
+  flex: 2;
+  /* border: solid red; */
 }
 
 .footer{
   flex: .1;
   height: 100%;
-  border: solid hotpink;
+  /* border: solid hotpink; */
   text-align: center;
  
 }
@@ -146,6 +150,21 @@ input[type="file"] {
   text-align: center;
   vertical-align: middle;
   padding: 5px;
+}
+
+.log-container{
+  /* border: solid black; */
+  display: flex;
+}
+
+.log{
+  padding-left: 30px;
+  flex:2.9;
+  /* border: dashed hotpink; */
+}
+
+.log-buffer{
+  flex: 1;
 }
 
 

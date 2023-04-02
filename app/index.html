@@ -165,10 +165,10 @@
         </ul>
       </div>
     </div>
-    <div class="outer-item2 main-container" style="border:solid brown;">
+    <div class="outer-item2 main-container">
       <!-- TOP DIV TO PROVIDE SPACE -->
-      <div class="mc-1" style="background-color: lightgreen;">
-        Div Spacers
+      <div class="mc-1">
+        <!-- Div Spacers -->
       </div>
       <!-- BOTTOM; CONTAINS CENTER AREA AND TREE VIEW -->
       <div class="mc-2 ct-container">
@@ -200,21 +200,18 @@
                           </div>
                         </div>
                 
-                        <!-- Send Binary and file chooser -->
-                        <div class="row">
-                          <div class="col-6"></div>
-                          <div class="col-2 gy-4">
-                            <label for="sendBinButton" class="button blue">
-                              <span>Send Binary</span>
-                            </label>
-                            <input type="file" id="sendBinButton"></input>
-                          </div>
+                       <!-- Send Binary and file chooser -->
+                       <div class="row">
+                        <div class="col-6"></div>
+                        <div class="col-2 gy-4">
+                          <button class="button blue" type="button" id="choseFileButton" hidden><span>Load File</span></button>
                         </div>
+                       </div>
                 
                         <!-- Connection status -->
                         <div class="row">
-                          <div class="col-4 gy-4">
-                            <h4 id="connectionStatus">Connection Status: IDLE</h4>
+                          <div class="col-8 gy-4">
+                            <h5 id="connectionStatus">Connection Status: IDLE</h5>
                           </div>
                         </div>
                       </div>
@@ -222,8 +219,16 @@
                       <div id="tree" class="tree"></div>
             </div>
             <!-- LOG SECTION -->
-            <div class="inlc-2">
-                      LOG
+            <div class="inlc-2 log-container">
+              <div class="log">
+                <div><h5>LOGS</h5></div>
+                <div class="container-text">
+                  <div class="comment">
+                    <textarea id="logArea" class="textinput" autofocus></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="log-buffer"></div>
             </div>
             <!-- FOOTER -->
             <div class="footer">
@@ -234,7 +239,7 @@
           </div>
         </div> 
         <!-- TREE VIEW -->
-        <div class="two mt-item2" style="border: dashed olive;">
+        <div class="two mt-item2">
         </div>
       </div>
      
