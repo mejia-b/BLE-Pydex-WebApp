@@ -1,9 +1,8 @@
 //---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput');
-const stringToSend = document.getElementById('stringToSend');
+const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
-const sendPacket = document.getElementById('sendPacket');
 const choseFileButton = document.getElementById('choseFileButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
@@ -117,7 +116,7 @@ maxFileRecordLength[3] = 0;
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
 choseFileButton.addEventListener('click', chooseFile);
-sendPacket.addEventListener('click', sendPacketFunction);
+
 
 //---------- Functions ----------
 
@@ -255,7 +254,7 @@ function handleNotifications_arm_prop_data(event) {
 }
 
 async function checkIfConnectedToOTAS() {
-  if (device.name === 'XTAS') {
+  if (device.name === 'OTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
         'e0262760-08c2-11e1-9073-0e8ac72e1001');
@@ -302,6 +301,7 @@ async function checkIfConnectedToOTAS() {
       await wdsxFileAuthenticationCharacteristic.startNotifications();
       OTAS_CURRENT_STATE = OTAS_CONNECTED_STATE;
       logger('OTAS_CONNECTED_STATE is set to ' + OTAS_CONNECTED_STATE);
+      choseFileButton.removeAttribute('hidden');
     } else {
       logger('WDXS service not found');
     }
