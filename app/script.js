@@ -207,9 +207,17 @@ async function sendBLEData() {
   // } catch (error) {
   //   loggerError(error);
   // }
+
   // TODO revert the above code
-  OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
-  handleNotifications_wdxs_otas();
+  // kicko ff bootload
+  // OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
+  // handleNotifications_wdxs_otas();
+
+  updateAccordionElement(
+      'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
+  addNewAccordionItem('test1', 'test2', 'edwin', 'brenda');
+  updateAccordionElement(
+      'test1', 'test2', 'edwin too cool', 'b is really cool');
 }
 
 async function sendWdxsData(characteristic, data, response) {
@@ -541,4 +549,38 @@ async function sendPacketFunction() {
   packetToSend.set(newFileHandle, 1);
   sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true);
   logger('Sent packet to verify file' + packetToSend);
+}
+
+function createAccordionItem(headerId, bodyId, headerText, bodyText) {
+  var newItem = `
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="${headerId}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${
+      bodyId}" aria-expanded="false" aria-controls="${bodyId}">${headerText}
+      </button>
+    </h2>
+    <div id="${bodyId}" class="accordion-collapse collapse" aria-labelledby="${
+      headerId}" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        ${bodyText}
+      </div>
+    </div>
+  </div>
+`;
+  return newItem;
+}
+function addNewAccordionItem(headerId, bodyId, headerText, bodyText) {
+  const accordion = document.querySelector('#accordionExample');
+  const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
+  accordion.innerHTML += newItem;
+}
+function updateAccordionElement(headerId, bodyId, headerText, bodyText) {
+  document.getElementById(headerId).innerHTML =
+      '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' +
+      bodyId + '" aria-expanded="false" aria-controls="' + bodyId + '">' +
+      headerText + '</button>';
+
+  // Update parent text
+  document.getElementById(bodyId).innerHTML =
+      '<div class="accordion-body">' + bodyText + '</div>';
 }
