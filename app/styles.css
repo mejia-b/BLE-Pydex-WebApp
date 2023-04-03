@@ -64,12 +64,18 @@ input[type="file"] {
 }
 
 .mt-item1{
-  flex:6;
+  /* middle area */
+  flex:5;
   /* border: dotted rgb(12, 5, 12); */
 }
 .mt-item2{
-  /* border: dashed olive; */
-  flex: 2;
+ /* border: dashed olive; */ 
+ /* right area */
+  flex: 4;
+  margin: 0px auto;
+  margin-right: 80px;
+  padding-right: 80px;
+  padding-bottom: 30px;
 }
 
 /* Textarea */
