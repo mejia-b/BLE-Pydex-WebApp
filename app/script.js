@@ -157,6 +157,11 @@ async function BLEManager() {
     connectedDevice = await device.gatt.connect();
     connectionStatus.textContent = 'Connection Status: CONNECTED';
     logger('Connected to ' + device.name);
+    var charCount = 0;
+    var serviceText = "";
+    var serviceID = "SRVC";
+    var charText = "";
+    var cahrID = "CHAR";
 
     try {
       logger('Getting Services...');
@@ -165,6 +170,8 @@ async function BLEManager() {
       logger('Getting Characteristics...');
       for (const service of services) {
         logger('Service: ' + service.uuid);
+        serviceText = '<strong><p style="color:red;">Service: </p>' + service.uuid + '</strong>';
+        serviceID = "SRVC"+charCount;
         const characteristics = await service.getCharacteristics();
         count = 0;
         characteristics.forEach(characteristic => {
@@ -177,8 +184,13 @@ async function BLEManager() {
                 '  ├── Characteristic: ' + characteristic.uuid + ' ' +
                 getSupportedProperties(characteristic));
           }
+        charText += '<strong><p style="color:blue;">Char\n</p>' + 'UUID: ' + characteristic.uuid + '</strong>\n';
+        charID = "CHAR"+charCount;
+        charCount++;
           count++;
         });
+        addNewAccordionItem(serviceID,charID, serviceText, charText);
+        charText="";
       }
     } catch (error) {
       loggerError(error);
@@ -212,12 +224,15 @@ async function sendBLEData() {
   // kicko ff bootload
   // OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
   // handleNotifications_wdxs_otas();
-
+  var0 = 0; //trying to use integrs as ID value didnt work
+  var1 = 1; //but i need integrers to be able to increment
+  str0 = 'ID'+var0;
+  str1 = 'ID'+var1;
   updateAccordionElement(
       'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
-  addNewAccordionItem('test1', 'test2', 'edwin', 'brenda');
+  addNewAccordionItem(str0,str1, 'edwin', 'brenda');
   updateAccordionElement(
-      'test1', 'test2', 'edwin too cool', 'b is really cool');
+    str0, str1, 'edwin too cool', 'b is really cool');
 }
 
 async function sendWdxsData(characteristic, data, response) {
