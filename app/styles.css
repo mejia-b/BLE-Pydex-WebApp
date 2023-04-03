@@ -65,7 +65,7 @@ input[type="file"] {
 
 .mt-item1{
   /* middle area */
-  flex:5;
+  flex:7;
   /* border: dotted rgb(12, 5, 12); */
 }
 .mt-item2{
@@ -132,15 +132,17 @@ input[type="file"] {
 }
 
 .inlc-1{
+  /* top aarea of middle area */
   height: 100%;
-  flex: 2;
+  flex: 3;
   /* border: dashed greenyellow; */
 }
 
 .inlc-2{
+  /* bottom area of middle */
   height: 100%;
-  flex: 2;
-  /* border: solid red; */
+  flex: 5;
+  /* border: solid red; */ 
 }
 
 .footer{
