@@ -18,9 +18,9 @@ body {
   /* Firefox */
 }
 
-input[type="file"] {
+/* input[type="file"] {
   display: none;
-}
+} */
 
 .outer-container {
   flex-direction: row;
@@ -49,7 +49,7 @@ input[type="file"] {
 
 .mc-1 {
   /* background-color: lightgreen; */
-  flex: .69;
+  flex: .3;
   /* border: solid red; */
 
 }
@@ -74,7 +74,7 @@ input[type="file"] {
 }
 
 .mt-item2 {
-  border: dashed olive;
+  /* border: dashed olive; */
   /* right area */
   flex: 4;
   margin: 0px auto;
@@ -116,22 +116,23 @@ input[type="file"] {
 .inputs-container {
   display: flex;
   flex-direction: row;
-  border: solid burlywood;
+  /* border: solid burlywood; */
   /* border: dotted rgb(12, 5, 12); */
 }
 
 .tree {
-  border: dotted rgb(12, 5, 12);
+  /* border: dotted rgb(12, 5, 12); */
   flex: 1.8;
 }
 
 .inputs {
   /* border: solid mediumslateblue; */
-  padding-top: 30px;
+
   padding-left: 30px;
-  flex: 5;
+  margin-left: 20px;
+  flex: 8;
   height: 100%;
-  border: dotted rgb(12, 5, 12);
+  /* border: dotted rgb(12, 5, 12); */
 }
 
 .inputs-log-container {
@@ -145,7 +146,7 @@ input[type="file"] {
   /* top aarea of middle area */
   height: 100%;
   flex: 3;
-  padding-left: 30px;
+  /* padding-left: 30px; */
 
   /* border: dashed greenyellow; */
 }
@@ -178,8 +179,9 @@ input[type="file"] {
 }
 
 .log {
+  margin-left: 20px;
   padding-left: 30px;
-  flex: 2.9;
+  flex: 4.45;
   /* border: dashed hotpink; */
 }
 
