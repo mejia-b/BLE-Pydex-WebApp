@@ -3,7 +3,7 @@ const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
-const choseFileButton = document.getElementById('choseFileButton');
+//const choseFileButton = document.getElementById('choseFileButton');
 const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
@@ -11,9 +11,8 @@ fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
 //---------- File chooser ----------
-const input = document.createElement('input');
-input.type = 'file';
-input.addEventListener('change', function() {
+const choseFileButton = document.getElementById('choseFileButton');
+choseFileButton.addEventListener('change', function() {
   reader.readAsArrayBuffer(this.files[0]);
   // get file size
   fileSize = this.files[0].size;
@@ -115,7 +114,6 @@ maxFileRecordLength[3] = 0;
 //---------- Buttons ----------
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
-choseFileButton.addEventListener('click', chooseFile);
 
 
 //---------- Functions ----------
@@ -250,10 +248,6 @@ async function sendWdxsData(characteristic, data, response) {
 }
 
 
-async function chooseFile() {
-  logger('Opening file selector');
-  input.click();
-}
 
 function getSupportedProperties(characteristic) {
   let supportedProperties = [];
