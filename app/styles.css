@@ -25,7 +25,7 @@ body {
 .outer-container {
   flex-direction: row;
   margin: 0;
-  padding-left: 10px;
+  padding-left: 0px;
   display: flex;
   height: 100%;
   /* border: dashed orange; */
@@ -45,7 +45,7 @@ body {
   flex-direction: column;
   /* border: solid orange; */
   align-items: auto;
-  margin-top: 50px;
+  margin-top: 1.5%;
 
 }
 
@@ -76,21 +76,19 @@ body {
 }
 
 .mt-item2 {
-  /* border: dashed olive; */
+
   /* right area */
   flex: 4;
   margin: 0px auto;
-  margin-right: 80px;
+  margin-right: 5%;
   padding-right: 80px;
   padding-bottom: 30px;
 }
 
-/* Textarea */
-.container {
-  max-width: 820px;
-  margin: 0px auto;
-  margin-top: 50px;
 
+
+.content {
+  flex-grow: 1;
 }
 
 .comment {
@@ -133,6 +131,7 @@ body {
 
   padding-left: 30px;
   margin-left: 20px;
+  margin-right: 120px;
   flex: 8;
   height: 100%;
 
@@ -182,14 +181,14 @@ body {
 .log {
   margin-left: 20px;
   padding-left: 30px;
-  flex: 4.45;
+  margin-right: 120px;
+  flex: 1;
   height: 100%;
   /* border: dashed hotpink; */
 }
 
-.log-buffer {
-  flex: 1;
-}
+
+
 
 /* ************************ start of bootstrap css ************************ */
 @charset "UTF-8";

@@ -142,6 +142,8 @@
 </svg>
 
 <body>
+
+
   <div class="outer-container">
     <!-- SIDE BAR -->
     <div class="outer-item1 d-flex flex-column flex-shrink p-3 bg-light" style="width: 280px;">
@@ -214,25 +216,18 @@
     </div>
     <div class="main-container">
       <!-- TOP DIV TO PROVIDE SPACE -->
-      <div class="mc-1">
-        <!-- Div Spacers -->
 
-      </div>
       <!-- BOTTOM; CONTAINS CENTER AREA AND TREE VIEW -->
       <div class="mc-2 ct-container">
         <!-- MAIN AREA -->
         <div class="main mt-item1">
           <div class="inputs-log-container">
             <div class="inlc-1 inputs-container">
-
-
-
               <div class="inputs">
                 <div class="card mb-3 pb-3">
-                  <h3 class="card-header">Connection</h3>
+                  <h6 class="card-header">Connection</h6>
                   <div class="card-body">
-                    <h5 class="card-title">Special title treatment</h5>
-                    <h6 class="card-subtitle text-muted">Support card subtitle</h6>
+
                   </div>
 
                   <!-- INPUT BOXES AND BUTTONS -->
@@ -262,46 +257,38 @@
 
                 </div>
                 <div class="card mb-3 pb-3">
-                  <h3 class="card-header">OTA Update</h3>
+                  <h6 class="card-header">OTA Update</h6>
 
                   <div class="card-body">
-                    <h5 class="card-title">Performa OTA firmware updates using MAX32xxx BLE Microcontrollers</h4>
-                      <br></br>
-                      <form>
-                        <fieldset>
-                          <div class="form-group">
-                            <input class="form-control" type="file" id="choseFileButton">
-                          </div>
-                        </fieldset>
-                      </form>
-                      <div class="row">
 
 
-                        <div class="d-grid gap-2 gy-4">
-
-                          <button bs-btn-bg: class="btn btn-lg btn-primary type=" button"
-                            style="--bs-btn-bg: #09c1fe;">Start update</button>
+                    <form>
+                      <fieldset>
+                        <div class="form-group">
+                          <input class="form-control" type="file" id="choseFileButton">
                         </div>
+                      </fieldset>
+                    </form>
+                    <div class="row">
+
+
+                      <div class="d-grid gap-2 gy-4">
+
+                        <button bs-btn-bg: class="btn btn-lg btn-primary type=" button"
+                          style="--bs-btn-bg: #09c1fe;">Start update</button>
                       </div>
-                      <br></br>
+                    </div>
+                    <br></br>
 
-                      <div class="alert alert-dismissible alert-danger">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
-                        runinng the BLE_otas example using external flash.
-                      </div>
-
-
-
-
+                    <div class="alert alert-dismissible alert-danger">
+                      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
+                      runinng the BLE_otas example using external flash.
+                    </div>
                   </div>
                 </div>
               </div>
-
-
               <!-- TREE -->
-              <div id="tree" class="tree"></div>
-
 
             </div>
             <!---------------------------------LOG SECTION -------------------------------------->
@@ -310,13 +297,15 @@
                 <form>
                   <div class="form-group">
                     <label for="logArea" class="form-label mt-4">Logs</label>
-                    <textarea class="form-control" id="logArea" rows="15"></textarea>
+                    <textarea class="form-control" id="logArea" rows="5"></textarea>
                   </div>
 
                 </form>
 
               </div>
-              <div class="log-buffer"></div>
+              <div class="log-buffer">
+
+              </div>
             </div>
             <!-- FOOTER -->
             <div class="footer">
@@ -330,14 +319,15 @@
         <div class="two mt-item2">
           <!------- start of side cards -->
           <div class="card mb-3">
-            <h3 class="card-header">GATT Server</h3>
+            <h6 class="card-header">GATT Server</h6>
             <div class="card-body">
               <h5 class="card-title">Special title treatment</h5>
               <h6 class="card-subtitle text-muted">Support card subtitle</h6>
             </div>
 
             <div class="card-body">
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                card's
                 content.</p>
             </div>
             <!-----------------------------------------Start of accordion -->
@@ -355,9 +345,10 @@
           </div>
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
+              <h6 class="card-title">Card title</h6>
               <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                card's
                 content.</p>
               <a href="#" class="card-link">Card link</a>
               <a href="#" class="card-link">Another link</a>
