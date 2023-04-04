@@ -261,21 +261,39 @@
                   <!-- Send Binary and file chooser -->
 
                 </div>
-                <form>
-                  <fieldset>
-                    <div class="form-group">
-                      <input class="form-control" type="file" id="choseFileButton">
-                    </div>
-                  </fieldset>
-                </form>
-                <div class="card">
+                <div class="card mb-3 pb-3">
+                  <h3 class="card-header">OTA Update</h3>
+
                   <div class="card-body">
-                    <h4 class="card-title">Card title</h4>
-                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                      card's content.</p>
-                    <a href="#" class="card-link">Card link</a>
-                    <a href="#" class="card-link">Another link</a>
+                    <h5 class="card-title">Performa OTA firmware updates using MAX32xxx BLE Microcontrollers</h4>
+                      <br></br>
+                      <form>
+                        <fieldset>
+                          <div class="form-group">
+                            <input class="form-control" type="file" id="choseFileButton">
+                          </div>
+                        </fieldset>
+                      </form>
+                      <div class="row">
+
+
+                        <div class="d-grid gap-2 gy-4">
+
+                          <button bs-btn-bg: class="btn btn-lg btn-primary type=" button"
+                            style="--bs-btn-bg: #09c1fe;">Start update</button>
+                        </div>
+                      </div>
+                      <br></br>
+
+                      <div class="alert alert-dismissible alert-danger">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
+                        runinng the BLE_otas example using external flash.
+                      </div>
+
+
+
+
                   </div>
                 </div>
               </div>
