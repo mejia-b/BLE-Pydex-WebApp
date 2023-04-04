@@ -3,8 +3,6 @@ const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
-//const choseFileButton = document.getElementById('choseFileButton');
-const connectionStatus = document.getElementById('connectionStatus');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
 fileSize = 0;
@@ -139,7 +137,6 @@ reader.onload = function() {
 // Async function to connect to BLE device, discover services and
 // characteristics
 async function BLEManager() {
-  connectionStatus.textContent = 'SEARCHING';
   try {
     device = await navigator.bluetooth.requestDevice({
       acceptAllDevices: true,
@@ -153,13 +150,13 @@ async function BLEManager() {
     });
 
     connectedDevice = await device.gatt.connect();
-    connectionStatus.textContent = 'Connection Status: CONNECTED';
+    // TODO: Update connection status
     logger('Connected to ' + device.name);
     var charCount = 0;
-    var serviceText = "";
-    var serviceID = "SRVC";
-    var charText = "";
-    var cahrID = "CHAR";
+    var serviceText = '';
+    var serviceID = 'SRVC';
+    var charText = '';
+    var cahrID = 'CHAR';
 
     try {
       logger('Getting Services...');
@@ -168,8 +165,9 @@ async function BLEManager() {
       logger('Getting Characteristics...');
       for (const service of services) {
         logger('Service: ' + service.uuid);
-        serviceText = '<strong><p style="color:red;">Service: </p>' + service.uuid + '</strong>';
-        serviceID = "SRVC"+charCount;
+        serviceText = '<strong><p style="color:red;">Service: </p>' +
+            service.uuid + '</strong>';
+        serviceID = 'SRVC' + charCount;
         const characteristics = await service.getCharacteristics();
         count = 0;
         characteristics.forEach(characteristic => {
@@ -182,13 +180,14 @@ async function BLEManager() {
                 '  ├── Characteristic: ' + characteristic.uuid + ' ' +
                 getSupportedProperties(characteristic));
           }
-        charText += '<strong><p style="color:blue;">Char\n</p>' + 'UUID: ' + characteristic.uuid + '</strong>\n';
-        charID = "CHAR"+charCount;
-        charCount++;
+          charText += '<strong><p style="color:blue;">Char\n</p>' +
+              'UUID: ' + characteristic.uuid + '</strong>\n';
+          charID = 'CHAR' + charCount;
+          charCount++;
           count++;
         });
-        addNewAccordionItem(serviceID,charID, serviceText, charText);
-        charText="";
+        addNewAccordionItem(serviceID, charID, serviceText, charText);
+        charText = '';
       }
     } catch (error) {
       loggerError(error);
@@ -200,9 +199,10 @@ async function BLEManager() {
   } catch (error) {
     loggerError(error);
     if (typeof device !== 'undefined') {
-      connectionStatus.textContent = 'Connection Status: FAILED';
+      // TODO: Update connection status
+      // connectionStatus.textContent = 'Connection Status: FAILED';
     } else {
-      connectionStatus.textContent = 'Connection Status: CANCELLED';
+      // connectionStatus.textContent = 'Connection Status: CANCELLED';
     }
   }
 }
@@ -222,15 +222,14 @@ async function sendBLEData() {
   // kicko ff bootload
   // OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
   // handleNotifications_wdxs_otas();
-  var0 = 0; //trying to use integrs as ID value didnt work
-  var1 = 1; //but i need integrers to be able to increment
-  str0 = 'ID'+var0;
-  str1 = 'ID'+var1;
+  var0 = 0;  // trying to use integrs as ID value didnt work
+  var1 = 1;  // but i need integrers to be able to increment
+  str0 = 'ID' + var0;
+  str1 = 'ID' + var1;
   updateAccordionElement(
       'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
-  addNewAccordionItem(str0,str1, 'edwin', 'brenda');
-  updateAccordionElement(
-    str0, str1, 'edwin too cool', 'b is really cool');
+  addNewAccordionItem(str0, str1, 'edwin', 'brenda');
+  updateAccordionElement(str0, str1, 'edwin too cool', 'b is really cool');
 }
 
 async function sendWdxsData(characteristic, data, response) {
