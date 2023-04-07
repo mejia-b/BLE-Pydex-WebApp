@@ -3,11 +3,14 @@ const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
+const startUpdateButton = document.getElementById('startUpdateButton');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
+charCallBacks = [10];
+charCallBackCount = 0;
 //---------- File chooser ----------
 const choseFileButton = document.getElementById('choseFileButton');
 choseFileButton.addEventListener('change', function() {
@@ -112,7 +115,7 @@ maxFileRecordLength[3] = 0;
 //---------- Buttons ----------
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
-
+startUpdateButton.addEventListener('click', startUpdate);
 
 //---------- Functions ----------
 
@@ -232,6 +235,11 @@ async function sendBLEData() {
   updateAccordionElement(str0, str1, 'edwin too cool', 'b is really cool');
 }
 
+async function startUpdate() {
+  // kicko ff bootload
+  OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
+  handleNotifications_wdxs_otas();
+}
 async function sendWdxsData(characteristic, data, response) {
   try {
     var uint8array = new TextEncoder().encode(stringToSend.value);
@@ -581,6 +589,14 @@ function addNewAccordionItem(headerId, bodyId, headerText, bodyText) {
   const accordion = document.querySelector('#accordionExample');
   const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
   accordion.innerHTML += newItem;
+  charCallBacks[charCallBackCount] = document.getElementById(bodyId);
+  charCallBacks[charCallBackCount].addEventListener('click', () => {
+    buttonCB(charCallBackCount);
+  });
+  charCallBackCount++;
+}
+function buttonCB(id) {
+  logger('the button pressed is ' + id);
 }
 function updateAccordionElement(headerId, bodyId, headerText, bodyText) {
   document.getElementById(headerId).innerHTML =

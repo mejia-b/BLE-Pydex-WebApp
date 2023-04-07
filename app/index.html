@@ -43,11 +43,14 @@
       text-align: center;
       font-size: 18px;
       padding: 0px;
-      width: 120px;
       height: 40px;
       transition: all 0.2s;
       cursor: pointer;
       margin: 0px;
+      display: block;
+      width: auto;
+      min-width: 150px;
+
     }
 
     .button span {
@@ -63,6 +66,7 @@
       opacity: 0;
       top: 0;
       right: -20px;
+
       transition: 0.2s;
 
     }
@@ -272,10 +276,12 @@
                     <div class="row">
 
 
-                      <div class="d-grid gap-2 gy-4">
-
-                        <button bs-btn-bg: class="btn btn-lg btn-primary type=" button"
-                          style="--bs-btn-bg: #09c1fe;">Start update</button>
+                      <div class="row ">
+                        <div class="col-4 gy-4">
+                          <button id="startUpdateButton" class="button blue" type="button"
+                            style="--bs-btn-bg: #09c1fe;"><span>Start
+                              update</span></button>
+                        </div>
                       </div>
                     </div>
                     <br></br>
