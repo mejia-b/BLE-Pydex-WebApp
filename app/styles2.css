@@ -1,0 +1,25 @@
+
+
+html,body{
+    margin: 0;
+    width: 100%;
+}
+
+.wrapper{
+    display: flex;
+    border: 2px solid orange;
+}
+
+#sidebar{
+    height: 100vh;
+    border: 2px solid green;
+}
+
+
+#connection{
+    margin-left: 50px;
+}
+
+#bottom-left-card{
+    margin-left: 50px;
+}
