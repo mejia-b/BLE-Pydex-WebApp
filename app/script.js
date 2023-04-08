@@ -1,3 +1,4 @@
+
 //---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
@@ -5,6 +6,14 @@ const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
 const startUpdateButton = document.getElementById('startUpdateButton');
 const logArea = document.getElementById('logArea');
+const OTAUpdateCard = document.getElementById('OTAUpdateCard');
+//---------- Buttons ----------
+connectButton.addEventListener('click', BLEManager);
+sendButton.addEventListener('click', sendBLEData);
+startUpdateButton.addEventListener('click', startUpdate);
+
+
+
 crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
@@ -129,10 +138,6 @@ maxFileRecordLength[3] = 0;
 //                   + WDX_FLIST_HDR_SIZE).to_bytes(4,byteorder='little',signed=False)
 
 // clang-format on
-//---------- Buttons ----------
-connectButton.addEventListener('click', BLEManager);
-sendButton.addEventListener('click', sendBLEData);
-startUpdateButton.addEventListener('click', startUpdate);
 
 //---------- Functions ----------
 
@@ -159,14 +164,14 @@ reader.onload = function() {
 async function BLEManager() {
   try {
     device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
+      acceptAllDevices: true
       //   filters: [{
       //     name: deviceNameInput.value,
       //   }],
-      optionalServices: [
-        'e0262760-08c2-11e1-9073-0e8ac72e1001',
-        '0000fef6-0000-1000-8000-00805f9b34fb'
-      ]
+      // optionalServices: [
+      //   'e0262760-08c2-11e1-9073-0e8ac72e1001',
+      //   '0000fef6-0000-1000-8000-00805f9b34fb'
+      // ]
     });
 
     connectedDevice = await device.gatt.connect();
@@ -193,8 +198,6 @@ async function BLEManager() {
         serviceArray.push(new bleService(service.uuid, serviceCount));
         serviceArray[serviceCount].characteristics.push(...charArray);
         serviceCount++;
-
-        charText = '';
       }
       console.log(serviceArray);
       createAccordion(serviceArray);
@@ -285,7 +288,7 @@ function handleNotifications_arm_prop_data(event) {
 }
 
 async function checkIfConnectedToOTAS() {
-  if (device.name === 'OTAS') {
+  if (device.name === 'XTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
         'e0262760-08c2-11e1-9073-0e8ac72e1001');
@@ -332,7 +335,7 @@ async function checkIfConnectedToOTAS() {
       await wdsxFileAuthenticationCharacteristic.startNotifications();
       OTAS_CURRENT_STATE = OTAS_CONNECTED_STATE;
       logger('OTAS_CONNECTED_STATE is set to ' + OTAS_CONNECTED_STATE);
-      choseFileButton.removeAttribute('hidden');
+      OTAUpdateCard.removeAttribute('hidden');
     } else {
       logger('WDXS service not found');
     }
