@@ -34,9 +34,10 @@ const reader = new FileReader();
 
 //---------- BLE objects ----------
 class bleCharacteristic {
-  constructor(uuid, index) {
+  constructor(uuid, index, properties) {
     this.uuid = uuid;
     this.index = index;
+    this.properties = properties;
   }
 }
 
@@ -50,6 +51,25 @@ class bleService {
 
 connectedDevice = null;
 device = null;
+
+const uuids = {
+  '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access Profile',
+  '00001801-0000-1000-8000-00805f9b34fb': 'Generic Attribute Profile',
+  '00001802-0000-1000-8000-00805f9b34fb': 'Immediate Alert',
+  '00001803-0000-1000-8000-00805f9b34fb': 'Link Loss',
+  '0000fef6-0000-1000-8000-00805f9b34fb': 'WDXS Service',
+  '005f0002-2ff2-4ed5-b045-4c7463617865':
+      'WDX Device Configuration Characteristic',
+  '005f0003-2ff2-4ed5-b045-4c7463617865':
+      'WDX File Transfer Control Characteristic',
+  '005f0004-2ff2-4ed5-b045-4c7463617865':
+      'WDX File Transfer Data Characteristic',
+  '005f0005-2ff2-4ed5-b045-4c7463617865': 'WDX Authentication Characteristic',
+  'e0262760-08c2-11e1-9073-0e8ac72e1001': 'ARM Prop. Data Service',
+  'e0262760-08c2-11e1-9073-0e8ac72e0001': 'ARM Prop. Data Characteristic',
+
+  // Add more UUIDs here
+};
 
 //---------- OTAS stuff ----------
 // clang-format off
@@ -192,7 +212,9 @@ async function BLEManager() {
         // Characteristics
         var charArray = [];
         characteristics.forEach(characteristic => {
-          charArray.push(new bleCharacteristic(characteristic.uuid, charCount));
+          const properties = getSupportedProperties(characteristic);
+          charArray.push(new bleCharacteristic(
+              characteristic.uuid, charCount, properties));
           charCount++;
         });
         serviceArray.push(new bleService(service.uuid, serviceCount));
@@ -596,32 +618,54 @@ function createAccordionItem(headerId, bodyId, headerText, bodyText) {
   return newItem;
 }
 
+
 function createAccordion(serviceArray) {
   var accordion = document.getElementById('accordionExample');
   accordion.innerHTML = '';
   for (const service of serviceArray) {
-    var headerText = 'Service ' + service.index + ': ' + service.uuid;
+    var headerText = 'Service : ' + uuids[service.uuid];
+    if (!uuids[service.uuid]) {
+      headerText = 'Service : ' + service.uuid;
+    }
     var bodyText = '';
     for (const characteristic of service.characteristics) {
-      bodyText += `<button class="button blue" type="button" id="${
-          characteristic.uuid}" data-service-uuid="${
-          service.uuid}"><span>Characteristic ${characteristic.index}: ${
-          characteristic.uuid}</span></button>`;
+      var serviceName = uuids[service.uuid] || service.uuid;
+      var characteristicName =
+          uuids[characteristic.uuid] || characteristic.uuid;
+      var properties = characteristic.properties.split(',');
+      var badges = '';
+      for (const property of properties) {
+        if (property.includes('WRITEWITHOUTRESPONSE')) {
+          badges += `<span class="badge bg-warning float-end ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+        } else if (property.includes('WRITE')) {
+          badges += `<span class="badge bg-secondary float-end ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+          bodyText +=
+              `<button type="button" class="btn btn-primary float-end ms-1" onclick="console.log('${
+                  characteristic
+                      .uuid}')">Button</button><button type="button" class="btn btn-primary float-end ms-1" onclick="console.log('${
+                  characteristic.uuid}')">W</button>`;
+        } else if (property.includes('NOTIFY')) {
+          badges += `<span class="badge bg-info float-end ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+        } else {
+          badges += `<span class="badge bg-primary float-end ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+        }
+      }
+      bodyText +=
+          `<ul class="list-group"><li class="list-group-item d-flex align-items-center" onclick="console.log('Service Name: ${
+              serviceName}, Characteristic Name: ${
+              characteristicName}, Properties: ${
+              characteristic.properties}')"><div>${characteristicName}</div>${
+              badges}</li></ul>`;
     }
     var newAccordionItem = createAccordionItem(
         'heading' + service.index, 'collapse' + service.index, headerText,
         bodyText);
     accordion.insertAdjacentHTML('beforeend', newAccordionItem);
   }
-
-  // Add event listeners to every button
-  var buttons = document.querySelectorAll('.button');
-  buttons.forEach(button => {
-    button.addEventListener('click', () => {
-      console.log(`Service UUID: ${
-          button.dataset.serviceUuid}, Characteristic UUID: ${button.id}`);
-    });
-  });
 }
 function addNewAccordionItems(myStructArray) {
   const accordion = document.querySelector('#accordionExample');
