@@ -25,26 +25,28 @@ body {
 .outer-container {
   flex-direction: row;
   margin: 0;
-  padding-left: 10px;
+  padding-left: 0px;
   display: flex;
+  height: 100%;
   /* border: dashed orange; */
 }
 
 .outer-item1 {
+  height: 100vh;
   flex: 1;
 }
 
-.outer-item2 {
-  /* border: solid brown; */
-  flex: 7;
-}
+
 
 .main-container {
-  height: 100vh;
+  flex: 7;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   /* border: solid orange; */
   align-items: auto;
+  margin-top: 1.5%;
+
 }
 
 .mc-1 {
@@ -74,21 +76,19 @@ body {
 }
 
 .mt-item2 {
-  /* border: dashed olive; */
+
   /* right area */
   flex: 4;
   margin: 0px auto;
-  margin-right: 80px;
+  margin-right: 5%;
   padding-right: 80px;
   padding-bottom: 30px;
 }
 
-/* Textarea */
-.container {
-  max-width: 820px;
-  margin: 0px auto;
-  margin-top: 50px;
 
+
+.content {
+  flex-grow: 1;
 }
 
 .comment {
@@ -116,6 +116,7 @@ body {
 .inputs-container {
   display: flex;
   flex-direction: row;
+  height: 100%;
   /* border: solid burlywood; */
   /* border: dotted rgb(12, 5, 12); */
 }
@@ -130,8 +131,10 @@ body {
 
   padding-left: 30px;
   margin-left: 20px;
+  margin-right: 120px;
   flex: 8;
   height: 100%;
+
   /* border: dotted rgb(12, 5, 12); */
 }
 
@@ -139,6 +142,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow-y: auto;
   /* border: dashed darkred; */
 }
 
@@ -151,12 +155,7 @@ body {
   /* border: dashed greenyellow; */
 }
 
-.inlc-2 {
-  /* bottom area of middle */
-  height: 100%;
-  flex: 5;
-  /* border: solid red; */
-}
+
 
 .footer {
   flex: .1;
@@ -176,18 +175,20 @@ body {
 .log-container {
   /* border: solid black; */
   display: flex;
+  height: 100%;
 }
 
 .log {
   margin-left: 20px;
   padding-left: 30px;
-  flex: 4.45;
+  margin-right: 120px;
+  flex: 1;
+  height: 100%;
   /* border: dashed hotpink; */
 }
 
-.log-buffer {
-  flex: 1;
-}
+
+
 
 /* ************************ start of bootstrap css ************************ */
 @charset "UTF-8";

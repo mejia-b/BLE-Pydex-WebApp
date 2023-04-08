@@ -3,14 +3,18 @@ const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
+const startUpdateButton = document.getElementById('startUpdateButton');
 const logArea = document.getElementById('logArea');
 crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
+const charArray = [];
+charCallBackCount = 0;
+charCallBacks = [10];
 //---------- File chooser ----------
 const choseFileButton = document.getElementById('choseFileButton');
-choseFileButton.addEventListener('change', function() {
+choseFileButton.addEventListener('change', function () {
   reader.readAsArrayBuffer(this.files[0]);
   // get file size
   fileSize = this.files[0].size;
@@ -112,12 +116,12 @@ maxFileRecordLength[3] = 0;
 //---------- Buttons ----------
 connectButton.addEventListener('click', BLEManager);
 sendButton.addEventListener('click', sendBLEData);
-
+startUpdateButton.addEventListener('click', startUpdate);
 
 //---------- Functions ----------
 
 // Calculate CRC32 on file when file is selected or changed
-reader.onload = function() {
+reader.onload = function () {
   const buff = reader.result;
   const crc32 = CRC32.buf(new Uint8Array(buff));
   let bytes = new Uint8Array(buff);
@@ -164,29 +168,19 @@ async function BLEManager() {
 
       logger('Getting Characteristics...');
       for (const service of services) {
-        logger('Service: ' + service.uuid);
-        serviceText = '<strong><p style="color:red;">Service: </p>' +
-            service.uuid + '</strong>';
-        serviceID = 'SRVC' + charCount;
+        // logger('Service: ' + service.uuid);
+        // serviceText = '<strong><p style="color:red;">Service: </p>' +
+        //   service.uuid + '</strong>';
+        // serviceID = 'SRVC' + charCount;
         const characteristics = await service.getCharacteristics();
-        count = 0;
+        // count = 0;
         characteristics.forEach(characteristic => {
-          if (count == (characteristics.length - 1)) {
-            logger(
-                '  └── Characteristic: ' + characteristic.uuid + ' ' +
-                getSupportedProperties(characteristic));
-          } else {
-            logger(
-                '  ├── Characteristic: ' + characteristic.uuid + ' ' +
-                getSupportedProperties(characteristic));
-          }
-          charText += '<strong><p style="color:blue;">Char\n</p>' +
-              'UUID: ' + characteristic.uuid + '</strong>\n';
+          charCallBackCount++;
           charID = 'CHAR' + charCount;
+          charArray.push(new newCharacteristic(characteristic.uuid, charCount));
           charCount++;
-          count++;
         });
-        addNewAccordionItem(serviceID, charID, serviceText, charText);
+        addNewAccordionItems(charArray);
         charText = '';
       }
     } catch (error) {
@@ -204,6 +198,13 @@ async function BLEManager() {
     } else {
       // connectionStatus.textContent = 'Connection Status: CANCELLED';
     }
+  }
+}
+class newCharacteristic {
+  constructor(uuid, index) {
+    this.uuid = uuid;
+    this.index = index;
+
   }
 }
 
@@ -227,11 +228,16 @@ async function sendBLEData() {
   str0 = 'ID' + var0;
   str1 = 'ID' + var1;
   updateAccordionElement(
-      'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
+    'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
   addNewAccordionItem(str0, str1, 'edwin', 'brenda');
   updateAccordionElement(str0, str1, 'edwin too cool', 'b is really cool');
 }
 
+async function startUpdate() {
+  // kicko ff bootload
+  OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
+  handleNotifications_wdxs_otas();
+}
 async function sendWdxsData(characteristic, data, response) {
   try {
     var uint8array = new TextEncoder().encode(stringToSend.value);
@@ -273,42 +279,42 @@ async function checkIfConnectedToOTAS() {
   if (device.name === 'OTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
-        'e0262760-08c2-11e1-9073-0e8ac72e1001');
+      'e0262760-08c2-11e1-9073-0e8ac72e1001');
     // Discover ARMPropDataCharacteristic
     armPropDataCharacteristic = await armPropDataService.getCharacteristic(
-        'e0262760-08c2-11e1-9073-0e8ac72e0001');
+      'e0262760-08c2-11e1-9073-0e8ac72e0001');
 
 
     // Discover wdxs service and characteristics
     wdxsService = await connectedDevice.getPrimaryService(
-        '0000fef6-0000-1000-8000-00805f9b34fb');
+      '0000fef6-0000-1000-8000-00805f9b34fb');
     if (wdxsService) {
       logger('WDXS service found');
       // subscribe to all wdxs characteristics
       wdxsDeviceConfigCharacteristic = await wdxsService.getCharacteristic(
-          '005f0002-2ff2-4ed5-b045-4c7463617865');
+        '005f0002-2ff2-4ed5-b045-4c7463617865');
       wdxsFileTransferControlCharacteristic =
-          await wdxsService.getCharacteristic(
-              '005f0003-2ff2-4ed5-b045-4c7463617865');
+        await wdxsService.getCharacteristic(
+          '005f0003-2ff2-4ed5-b045-4c7463617865');
       wdxsFileTransferDataCharacteristic = await wdxsService.getCharacteristic(
-          '005f0004-2ff2-4ed5-b045-4c7463617865');
+        '005f0004-2ff2-4ed5-b045-4c7463617865');
       wdsxFileAuthenticationCharacteristic =
-          await wdxsService.getCharacteristic(
-              '005f0005-2ff2-4ed5-b045-4c7463617865');
+        await wdxsService.getCharacteristic(
+          '005f0005-2ff2-4ed5-b045-4c7463617865');
 
       // Enable notifications on ARMPropDataCharacteristic
       armPropDataCharacteristic.addEventListener(
-          'characteristicvaluechanged', handleNotifications_wdxs_otas);
+        'characteristicvaluechanged', handleNotifications_wdxs_otas);
 
       // Enable notifications on WDXS characteristics
       wdxsDeviceConfigCharacteristic.addEventListener(
-          'characteristicvaluechanged', handleNotifications_wdxs_otas);
+        'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdxsFileTransferControlCharacteristic.addEventListener(
-          'characteristicvaluechanged', handleNotifications_wdxs_otas);
+        'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdxsFileTransferDataCharacteristic.addEventListener(
-          'characteristicvaluechanged', handleNotifications_wdxs_otas);
+        'characteristicvaluechanged', handleNotifications_wdxs_otas);
       wdsxFileAuthenticationCharacteristic.addEventListener(
-          'characteristicvaluechanged', handleNotifications_wdxs_otas);
+        'characteristicvaluechanged', handleNotifications_wdxs_otas);
 
       await armPropDataCharacteristic.startNotifications();
       await wdxsDeviceConfigCharacteristic.startNotifications();
@@ -332,13 +338,13 @@ function logger(text) {
 }
 function loggerError(text) {
   logArea.textContent += '!!! ' + text + ' !!!' +
-      '\n';
+    '\n';
   logArea.scrollTop = logArea.scrollHeight;
 }
 function loggerData(text) {
   logArea.textContent += '    ' +
-      '[ ' + text + ' ]' +
-      '\n';
+    '[ ' + text + ' ]' +
+    '\n';
   logArea.scrollTop = logArea.scrollHeight;
 }
 
@@ -349,7 +355,7 @@ function handleNotifications_wdxs_otas() {
     OTAS_CURRENT_STATE = OTAS_SEND_FILE_STATE;
     EVENT_COUNTER = 0;
   }
-  setTimeout(function() {
+  setTimeout(function () {
     logger('Delaying 10ms');
   }, 10);
   switch (OTAS_CURRENT_STATE) {
@@ -493,14 +499,14 @@ async function sendFile() {
   exit = false;
 
   //  while (adrdressNum < fileBuffer.length) {
-  var intervalId = setInterval(function() {
+  var intervalId = setInterval(function () {
     if ((adrdressNum + chunkSize) > fileSize) {  // last chunk
-                                                 // send remaining bytes
+      // send remaining bytes
       var packetToSend =
-          new Uint8Array(fileSize - adrdressNum + addressBytes.length);
+        new Uint8Array(fileSize - adrdressNum + addressBytes.length);
       packetToSend.set(addressBytes, 0);
       packetToSend.set(
-          fileBuffer.slice(adrdressNum, fileSize), addressBytes.length);
+        fileBuffer.slice(adrdressNum, fileSize), addressBytes.length);
       sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, false);
       logger('Sent last chunk of file to address' + adrdressNum);
       OTAS_CURRENT_STATE = OTAS_SEND_VERIFY_REQ_STATE;
@@ -511,8 +517,8 @@ async function sendFile() {
       var packetToSend = new Uint8Array(chunkSize + addressBytes.length);
       packetToSend.set(addressBytes, 0);
       packetToSend.set(
-          fileBuffer.slice(adrdressNum, adrdressNum + chunkSize),
-          addressBytes.length);
+        fileBuffer.slice(adrdressNum, adrdressNum + chunkSize),
+        addressBytes.length);
       sendWdxsData(wdxsFileTransferDataCharacteristic, packetToSend, false);
       logger('Sent chunk of file to address' + adrdressNum);
     }
@@ -563,32 +569,46 @@ function createAccordionItem(headerId, bodyId, headerText, bodyText) {
   var newItem = `
   <div class="accordion-item">
     <h2 class="accordion-header" id="${headerId}">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${
-      bodyId}" aria-expanded="false" aria-controls="${bodyId}">${headerText}
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${bodyId}" aria-expanded="false" aria-controls="${bodyId}">${headerText}
       </button>
     </h2>
-    <div id="${bodyId}" class="accordion-collapse collapse" aria-labelledby="${
-      headerId}" data-bs-parent="#accordionExample">
+    <div id="${bodyId}" class="accordion-collapse collapse" aria-labelledby="${headerId}" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        ${bodyText}
+      <button class="button blue" type="button" id="sendButton"><span>${bodyText}</span></button>
       </div>
     </div>
   </div>
 `;
   return newItem;
 }
-function addNewAccordionItem(headerId, bodyId, headerText, bodyText) {
+function addNewAccordionItems(myStructArray) {
   const accordion = document.querySelector('#accordionExample');
-  const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
-  accordion.innerHTML += newItem;
+
+  myStructArray.forEach((item, index) => {
+    const headerId = `heading${index}`;
+    const bodyId = `collapse${index}`;
+    const headerText = `Item ${index + 1}`;
+    const bodyText = item.index;
+    const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
+    accordion.insertAdjacentHTML('beforeend', newItem);
+    const currentIndex = charCallBackCount;
+    charCallBacks[currentIndex] = document.getElementById(bodyId);
+    charCallBacks[currentIndex].addEventListener('click', () => {
+      buttonCB(currentIndex);
+    });
+    charCallBackCount++;
+  });
+}
+function buttonCB(id) {
+  logger('the button pressed is ' + id);
 }
 function updateAccordionElement(headerId, bodyId, headerText, bodyText) {
   document.getElementById(headerId).innerHTML =
-      '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' +
-      bodyId + '" aria-expanded="false" aria-controls="' + bodyId + '">' +
-      headerText + '</button>';
+    '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' +
+    bodyId + '" aria-expanded="false" aria-controls="' + bodyId + '">' +
+    headerText + '</button>';
 
   // Update parent text
   document.getElementById(bodyId).innerHTML =
-      '<div class="accordion-body">' + bodyText + '</div>';
+    '<div class="accordion-body">' + bodyText + '</div>';
 }
