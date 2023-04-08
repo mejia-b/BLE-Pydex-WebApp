@@ -637,7 +637,8 @@ function createAccordion(serviceArray) {
       for (const property of properties) {
         if (property.includes('WRITEWITHOUTRESPONSE')) {
           badges += `<span class="badge bg-warning float-end ms-1">${
-              property.replace('[', '').replace(']', '')}</span>`;
+              property.replace('[', '').replace(']', '').replace(
+                  'WRITEWITHOUTRESPONSE', 'WRITENORESP')}</span>`;
         } else if (property.includes('WRITE')) {
           badges += `<span class="badge bg-secondary float-end ms-1">${
               property.replace('[', '').replace(']', '')}</span>`;
