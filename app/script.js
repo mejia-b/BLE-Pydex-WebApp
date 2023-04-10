@@ -183,16 +183,27 @@ reader.onload = function() {
 // characteristics
 async function BLEManager() {
   try {
+    if(deviceNameInput.value == ""){
+      device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        //   filters: [{
+        //     name: deviceNameInput.value,
+        //   }],
+        optionalServices: [
+          'e0262760-08c2-11e1-9073-0e8ac72e1001',
+          '0000fef6-0000-1000-8000-00805f9b34fb'
+        ]
+      });
+  } else {
     device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true
-      //   filters: [{
-      //     name: deviceNameInput.value,
-      //   }],
+      filters: [{
+        name: deviceNameInput.value,
+      }]
       // optionalServices: [
       //   'e0262760-08c2-11e1-9073-0e8ac72e1001',
       //   '0000fef6-0000-1000-8000-00805f9b34fb'
-      // ]
     });
+  }
 
     connectedDevice = await device.gatt.connect();
     // TODO: Update connection status
@@ -615,45 +626,64 @@ function createAccordion(serviceArray) {
     if (!uuids[service.uuid]) {
       headerText = 'Service : ' + service.uuid;
     }
-    var bodyText = '';
-    for (const characteristic of service.characteristics) {
-      var serviceName = uuids[service.uuid] || service.uuid;
-      var characteristicName =
-          uuids[characteristic.uuid] || characteristic.uuid;
-      var properties = characteristic.properties.split(',');
-      var badges = '';
-      for (const property of properties) {
-        if (property.includes('WRITEWITHOUTRESPONSE')) {
-          badges += `<span class="badge bg-warning float-end ms-1">${
-              property.replace('[', '').replace(']', '').replace(
-                  'WRITEWITHOUTRESPONSE', 'WRITENORESP')}</span>`;
-        } else if (property.includes('WRITE')) {
-          badges += `<span class="badge bg-secondary float-end ms-1">${
-              property.replace('[', '').replace(']', '')}</span>`;
-          bodyText +=
-              `<button type="button" class="btn btn-primary float-end ms-1" onclick="console.log('${
-                  characteristic
-                      .uuid}')">Button</button><button type="button" class="btn btn-primary float-end ms-1" onclick="console.log('${
-                  characteristic.uuid}')">W</button>`;
-        } else if (property.includes('NOTIFY')) {
-          badges += `<span class="badge bg-info float-end ms-1">${
-              property.replace('[', '').replace(']', '')}</span>`;
-        } else {
-          badges += `<span class="badge bg-primary float-end ms-1">${
-              property.replace('[', '').replace(']', '')}</span>`;
-        }
-      }
-      bodyText +=
-          `<ul class="list-group"><li class="list-group-item d-flex align-items-center" onclick="console.log('Service Name: ${
-              serviceName}, Characteristic Name: ${
-              characteristicName}, Properties: ${
-              characteristic.properties}')"><div>${characteristicName}</div>${
-              badges}</li></ul>`;
-    }
+    var bodyText = createBodyText(service);
     var newAccordionItem = createAccordionItem(
         'heading' + service.index, 'collapse' + service.index, headerText,
         bodyText);
     accordion.insertAdjacentHTML('beforeend', newAccordionItem);
+  }
+}
+
+function createBodyText(service) {
+  var bodyText = '';
+  for (const characteristic of service.characteristics) {
+    var serviceName = uuids[service.uuid] || service.uuid;
+    var characteristicName =
+        uuids[characteristic.uuid] || characteristic.uuid;
+    var properties = characteristic.properties.split(',');
+    var badges = '';
+    var formCheckInput = '';
+    var button = '';
+    var formControl = '';
+    for (const property of properties) {
+      if (property.includes('WRITEWITHOUTRESPONSE') || property.includes('WRITE')) {
+        if (property.includes('WRITEWITHOUTRESPONSE')) {
+          badges += `<span class="badge bg-warning ms-1">${
+              property.replace('[', '').replace(']', '').replace(
+                  'WRITEWITHOUTRESPONSE', 'WRITENORESP')}</span>`;
+        } else {
+          badges += `<span class="badge bg-secondary ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+        }
+        button =
+            `<button type="button" class="btn btn-primary ms-1" onclick="console.log('${
+                characteristic.uuid}')">write</button>`;
+        formControl =
+            `<input class="form-control ms-1" id="deviceNameInput" placeholder="string to send">`;
+      } else if (property.includes('NOTIFY')) {
+        badges += `<span class="badge bg-info ms-1">${
+            property.replace('[', '').replace(']', '')}</span>`;
+        formCheckInput =
+            `<div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="${characteristic.uuid}" onchange="myCallback(this, '${characteristic.uuid}')" checked="">
+            <label class="form-check-label" for="${characteristic.uuid}">Enable Notify</label>
+          </div>`;
+      } else {
+        badges += `<span class="badge bg-primary ms-1">${
+            property.replace('[', '').replace(']', '')}</span>`;
+      }
+    }
+    bodyText +=
+        `<div class="card border-info mb-3"><div class="card-header">${characteristicName}</div><div class="card-body"><div class="pb-3">${formCheckInput}</div><div class="d-flex">${formControl}${button}</div></div><div class="card-footer">${badges}</div></div>`;
+  }
+  return bodyText;
+}
+function myCallback(checkbox, uuid) {
+  if (checkbox.checked) {
+    logger('Checkbox with ID ' + uuid + ' is checked!');
+  } else {
+    // Checkbox is not checked
+    logger('Checkbox with ID ' + uuid + ' is not checked!');
   }
 }
 function addNewAccordionItems(myStructArray) {

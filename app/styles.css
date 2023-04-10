@@ -5354,6 +5354,8 @@ fieldset:disabled .btn {
 
 .accordion-body {
   padding: var(--bs-accordion-body-padding-y) var(--bs-accordion-body-padding-x);
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .accordion-flush .accordion-collapse {
