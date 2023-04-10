@@ -243,28 +243,16 @@ async function BLEManager() {
 
 
 async function sendBLEData() {
-  // logger('Sending: ');
-  // loggerData(stringToSend.value);
-  // try {
-  //   var uint8array = new TextEncoder().encode(stringToSend.value);
-  //   armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
-  //   logger('Value has been written');
-  // } catch (error) {
-  //   loggerError(error);
-  // }
-
-  // TODO revert the above code
-  // kicko ff bootload
-  // OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
-  // handleNotifications_wdxs_otas();
-  var0 = 0;  // trying to use integrs as ID value didnt work
-  var1 = 1;  // but i need integrers to be able to increment
-  str0 = 'ID' + var0;
-  str1 = 'ID' + var1;
-  updateAccordionElement(
-      'headingOne', 'collapseOne', 'edwin is cool', 'really cool');
-  addNewAccordionItem(str0, str1, 'edwin', 'brenda');
-  updateAccordionElement(str0, str1, 'edwin too cool', 'b is really cool');
+  // TODO this needs to be generic
+  logger('Sending: ');
+  loggerData(stringToSend.value);
+  try {
+    var uint8array = new TextEncoder().encode(stringToSend.value);
+    armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
+    logger('Value has been written');
+  } catch (error) {
+    loggerError(error);
+  }
 }
 
 async function startUpdate() {
