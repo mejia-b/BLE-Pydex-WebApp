@@ -1,19 +1,30 @@
+
 //---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
 const connectButton = document.getElementById('connectButton');
 const sendButton = document.getElementById('sendButton');
-const choseFileButton = document.getElementById('choseFileButton');
-const connectionStatus = document.getElementById('connectionStatus');
+const startUpdateButton = document.getElementById('startUpdateButton');
 const logArea = document.getElementById('logArea');
+const OTAUpdateCard = document.getElementById('OTAUpdateCard');
+//---------- Buttons ----------
+connectButton.addEventListener('click', BLEManager);
+sendButton.addEventListener('click', sendBLEData);
+startUpdateButton.addEventListener('click', startUpdate);
+
+
+
 crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
+const charArray = [];
+const serviceArray = [];
+charCallBackCount = 0;
+charCallBacks = [10];
 //---------- File chooser ----------
-const input = document.createElement('input');
-input.type = 'file';
-input.addEventListener('change', function() {
+const choseFileButton = document.getElementById('choseFileButton');
+choseFileButton.addEventListener('change', function() {
   reader.readAsArrayBuffer(this.files[0]);
   // get file size
   fileSize = this.files[0].size;
@@ -22,8 +33,43 @@ input.addEventListener('change', function() {
 const reader = new FileReader();
 
 //---------- BLE objects ----------
+class bleCharacteristic {
+  constructor(uuid, index, properties) {
+    this.uuid = uuid;
+    this.index = index;
+    this.properties = properties;
+  }
+}
+
+class bleService {
+  constructor(uuid, index) {
+    this.uuid = uuid;
+    this.index = index;
+    this.characteristics = [];
+  }
+}
+
 connectedDevice = null;
 device = null;
+
+const uuids = {
+  '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access Profile',
+  '00001801-0000-1000-8000-00805f9b34fb': 'Generic Attribute Profile',
+  '00001802-0000-1000-8000-00805f9b34fb': 'Immediate Alert',
+  '00001803-0000-1000-8000-00805f9b34fb': 'Link Loss',
+  '0000fef6-0000-1000-8000-00805f9b34fb': 'WDXS Service',
+  '005f0002-2ff2-4ed5-b045-4c7463617865':
+      'WDX Device Configuration Characteristic',
+  '005f0003-2ff2-4ed5-b045-4c7463617865':
+      'WDX File Transfer Control Characteristic',
+  '005f0004-2ff2-4ed5-b045-4c7463617865':
+      'WDX File Transfer Data Characteristic',
+  '005f0005-2ff2-4ed5-b045-4c7463617865': 'WDX Authentication Characteristic',
+  'e0262760-08c2-11e1-9073-0e8ac72e1001': 'ARM Prop. Data Service',
+  'e0262760-08c2-11e1-9073-0e8ac72e0001': 'ARM Prop. Data Characteristic',
+
+  // Add more UUIDs here
+};
 
 //---------- OTAS stuff ----------
 // clang-format off
@@ -112,11 +158,6 @@ maxFileRecordLength[3] = 0;
 //                   + WDX_FLIST_HDR_SIZE).to_bytes(4,byteorder='little',signed=False)
 
 // clang-format on
-//---------- Buttons ----------
-connectButton.addEventListener('click', BLEManager);
-sendButton.addEventListener('click', sendBLEData);
-choseFileButton.addEventListener('click', chooseFile);
-
 
 //---------- Functions ----------
 
@@ -141,45 +182,58 @@ reader.onload = function() {
 // Async function to connect to BLE device, discover services and
 // characteristics
 async function BLEManager() {
-  connectionStatus.textContent = 'SEARCHING';
   try {
+    if(deviceNameInput.value == ""){
+      device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        //   filters: [{
+        //     name: deviceNameInput.value,
+        //   }],
+        optionalServices: [
+          'e0262760-08c2-11e1-9073-0e8ac72e1001',
+          '0000fef6-0000-1000-8000-00805f9b34fb'
+        ]
+      });
+  } else {
     device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      //   filters: [{
-      //     name: deviceNameInput.value,
-      //   }],
-      optionalServices: [
-        'e0262760-08c2-11e1-9073-0e8ac72e1001',
-        '0000fef6-0000-1000-8000-00805f9b34fb'
-      ]
+      filters: [{
+        name: deviceNameInput.value,
+      }]
+      // optionalServices: [
+      //   'e0262760-08c2-11e1-9073-0e8ac72e1001',
+      //   '0000fef6-0000-1000-8000-00805f9b34fb'
     });
+  }
 
     connectedDevice = await device.gatt.connect();
-    connectionStatus.textContent = 'Connection Status: CONNECTED';
+    // TODO: Update connection status
     logger('Connected to ' + device.name);
+    var charCount = 0;
+    var serviceCount = 0;
+
 
     try {
       logger('Getting Services...');
       const services = await connectedDevice.getPrimaryServices();
 
       logger('Getting Characteristics...');
+      // Services
       for (const service of services) {
-        logger('Service: ' + service.uuid);
         const characteristics = await service.getCharacteristics();
-        count = 0;
+        // Characteristics
+        var charArray = [];
         characteristics.forEach(characteristic => {
-          if (count == (characteristics.length - 1)) {
-            logger(
-                '  └── Characteristic: ' + characteristic.uuid + ' ' +
-                getSupportedProperties(characteristic));
-          } else {
-            logger(
-                '  ├── Characteristic: ' + characteristic.uuid + ' ' +
-                getSupportedProperties(characteristic));
-          }
-          count++;
+          const properties = getSupportedProperties(characteristic);
+          charArray.push(new bleCharacteristic(
+              characteristic.uuid, charCount, properties));
+          charCount++;
         });
+        serviceArray.push(new bleService(service.uuid, serviceCount));
+        serviceArray[serviceCount].characteristics.push(...charArray);
+        serviceCount++;
       }
+      console.log(serviceArray);
+      createAccordion(serviceArray);
     } catch (error) {
       loggerError(error);
     }
@@ -190,28 +244,33 @@ async function BLEManager() {
   } catch (error) {
     loggerError(error);
     if (typeof device !== 'undefined') {
-      connectionStatus.textContent = 'Connection Status: FAILED';
+      // TODO: Update connection status
+      // connectionStatus.textContent = 'Connection Status: FAILED';
     } else {
-      connectionStatus.textContent = 'Connection Status: CANCELLED';
+      // connectionStatus.textContent = 'Connection Status: CANCELLED';
     }
   }
 }
 
+
 async function sendBLEData() {
-  // logger('Sending: ');
-  // loggerData(stringToSend.value);
-  // try {
-  //   var uint8array = new TextEncoder().encode(stringToSend.value);
-  //   armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
-  //   logger('Value has been written');
-  // } catch (error) {
-  //   loggerError(error);
-  // }
-  // TODO revert the above code
+  // TODO this needs to be generic
+  logger('Sending: ');
+  loggerData(stringToSend.value);
+  try {
+    var uint8array = new TextEncoder().encode(stringToSend.value);
+    armPropDataCharacteristic.writeValueWithoutResponse(uint8array);
+    logger('Value has been written');
+  } catch (error) {
+    loggerError(error);
+  }
+}
+
+async function startUpdate() {
+  // kicko ff bootload
   OTAS_CURRENT_STATE = OTAS_FILE_DISCOVER_STATE;
   handleNotifications_wdxs_otas();
 }
-
 async function sendWdxsData(characteristic, data, response) {
   try {
     var uint8array = new TextEncoder().encode(stringToSend.value);
@@ -227,10 +286,6 @@ async function sendWdxsData(characteristic, data, response) {
 }
 
 
-async function chooseFile() {
-  logger('Opening file selector');
-  input.click();
-}
 
 function getSupportedProperties(characteristic) {
   let supportedProperties = [];
@@ -254,7 +309,7 @@ function handleNotifications_arm_prop_data(event) {
 }
 
 async function checkIfConnectedToOTAS() {
-  if (device.name === 'OTAS') {
+  if (device.name === 'XTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
         'e0262760-08c2-11e1-9073-0e8ac72e1001');
@@ -301,7 +356,7 @@ async function checkIfConnectedToOTAS() {
       await wdsxFileAuthenticationCharacteristic.startNotifications();
       OTAS_CURRENT_STATE = OTAS_CONNECTED_STATE;
       logger('OTAS_CONNECTED_STATE is set to ' + OTAS_CONNECTED_STATE);
-      choseFileButton.removeAttribute('hidden');
+      OTAUpdateCard.removeAttribute('hidden');
     } else {
       logger('WDXS service not found');
     }
@@ -479,7 +534,7 @@ async function sendFile() {
   //  while (adrdressNum < fileBuffer.length) {
   var intervalId = setInterval(function() {
     if ((adrdressNum + chunkSize) > fileSize) {  // last chunk
-                                                 // send remaining bytes
+      // send remaining bytes
       var packetToSend =
           new Uint8Array(fileSize - adrdressNum + addressBytes.length);
       packetToSend.set(addressBytes, 0);
@@ -541,4 +596,124 @@ async function sendPacketFunction() {
   packetToSend.set(newFileHandle, 1);
   sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true);
   logger('Sent packet to verify file' + packetToSend);
+}
+
+function createAccordionItem(headerId, bodyId, headerText, bodyText) {
+  var newItem = `
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="${headerId}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${
+      bodyId}" aria-expanded="false" aria-controls="${bodyId}">${headerText}
+      </button>
+    </h2>
+    <div id="${bodyId}" class="accordion-collapse collapse" aria-labelledby="${
+      headerId}" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+      ${bodyText}
+      </div>
+    </div>
+  </div>
+`;
+  return newItem;
+}
+
+
+function createAccordion(serviceArray) {
+  var accordion = document.getElementById('accordionExample');
+  accordion.innerHTML = '';
+  for (const service of serviceArray) {
+    var headerText = 'Service : ' + uuids[service.uuid];
+    if (!uuids[service.uuid]) {
+      headerText = 'Service : ' + service.uuid;
+    }
+    var bodyText = createBodyText(service);
+    var newAccordionItem = createAccordionItem(
+        'heading' + service.index, 'collapse' + service.index, headerText,
+        bodyText);
+    accordion.insertAdjacentHTML('beforeend', newAccordionItem);
+  }
+}
+
+function createBodyText(service) {
+  var bodyText = '';
+  for (const characteristic of service.characteristics) {
+    var serviceName = uuids[service.uuid] || service.uuid;
+    var characteristicName =
+        uuids[characteristic.uuid] || characteristic.uuid;
+    var properties = characteristic.properties.split(',');
+    var badges = '';
+    var formCheckInput = '';
+    var button = '';
+    var formControl = '';
+    for (const property of properties) {
+      if (property.includes('WRITEWITHOUTRESPONSE') || property.includes('WRITE')) {
+        if (property.includes('WRITEWITHOUTRESPONSE')) {
+          badges += `<span class="badge bg-warning ms-1">${
+              property.replace('[', '').replace(']', '').replace(
+                  'WRITEWITHOUTRESPONSE', 'WRITENORESP')}</span>`;
+        } else {
+          badges += `<span class="badge bg-secondary ms-1">${
+              property.replace('[', '').replace(']', '')}</span>`;
+        }
+        button =
+            `<button type="button" class="btn btn-primary ms-1" onclick="console.log('${
+                characteristic.uuid}')">write</button>`;
+        formControl =
+            `<input class="form-control ms-1" id="deviceNameInput" placeholder="string to send">`;
+      } else if (property.includes('NOTIFY')) {
+        badges += `<span class="badge bg-info ms-1">${
+            property.replace('[', '').replace(']', '')}</span>`;
+        formCheckInput =
+            `<div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="${characteristic.uuid}" onchange="myCallback(this, '${characteristic.uuid}')" checked="">
+            <label class="form-check-label" for="${characteristic.uuid}">Enable Notify</label>
+          </div>`;
+      } else {
+        badges += `<span class="badge bg-primary ms-1">${
+            property.replace('[', '').replace(']', '')}</span>`;
+      }
+    }
+    bodyText +=
+        `<div class="card border-info mb-3"><div class="card-header">${characteristicName}</div><div class="card-body"><div class="pb-3">${formCheckInput}</div><div class="d-flex">${formControl}${button}</div></div><div class="card-footer">${badges}</div></div>`;
+  }
+  return bodyText;
+}
+function myCallback(checkbox, uuid) {
+  if (checkbox.checked) {
+    logger('Checkbox with ID ' + uuid + ' is checked!');
+  } else {
+    // Checkbox is not checked
+    logger('Checkbox with ID ' + uuid + ' is not checked!');
+  }
+}
+function addNewAccordionItems(myStructArray) {
+  const accordion = document.querySelector('#accordionExample');
+
+  myStructArray.forEach((item, index) => {
+    const headerId = `heading${index}`;
+    const bodyId = `collapse${index}`;
+    const headerText = `Item ${index + 1}`;
+    const bodyText = item.index;
+    const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
+    accordion.insertAdjacentHTML('beforeend', newItem);
+    const currentIndex = charCallBackCount;
+    charCallBacks[currentIndex] = document.getElementById(bodyId);
+    charCallBacks[currentIndex].addEventListener('click', () => {
+      buttonCB(currentIndex);
+    });
+    charCallBackCount++;
+  });
+}
+function buttonCB(id) {
+  logger('the button pressed is ' + id);
+}
+function updateAccordionElement(headerId, bodyId, headerText, bodyText) {
+  document.getElementById(headerId).innerHTML =
+      '<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#' +
+      bodyId + '" aria-expanded="false" aria-controls="' + bodyId + '">' +
+      headerText + '</button>';
+
+  // Update parent text
+  document.getElementById(bodyId).innerHTML =
+      '<div class="accordion-body">' + bodyText + '</div>';
 }
