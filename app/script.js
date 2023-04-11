@@ -671,12 +671,18 @@ function createBodyText(service) {
   }
   return bodyText;
 }
+function createGenericListener(charUuid) {
+  return function (event) {
+    // handle the event here
+    console.log(`Characteristic ${charUuid} value changed: ${event.target.value}`);
+  }
+}
 async function enableNotification(checkbox, charUuid, serviceUuid) {
   if (checkbox.checked) {
     var service = await connectedDevice.getPrimaryService(serviceUuid);
     char = await service.getCharacteristic(charUuid);
-    // TODO add generic event listener
-    char.addEventListener('characteristicvaluechanged', someGenericListner);
+    var genericListener = createGenericListener(charUuid);
+    char.addEventListener('characteristicvaluechanged', genericListener);
     await char.startNotifications();
     logger('Checkbox with ID ' + charUuid + ' is checked!');
   } else {
