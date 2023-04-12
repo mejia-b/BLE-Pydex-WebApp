@@ -49,9 +49,12 @@ class bleService {
   }
 }
 
-connectedDevice = null;
-device = null;
+let services = {};
+let enabledNotifications = new Set();
+let connectedDevice = null;
+let device = null;
 
+// Here you can add more UUIDs per your application needs
 const uuids = {
   '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access Profile',
   '00001801-0000-1000-8000-00805f9b34fb': 'Generic Attribute Profile',
@@ -183,7 +186,7 @@ reader.onload = function() {
 // characteristics
 async function BLEManager() {
   try {
-    if(deviceNameInput.value == ""){
+    if (deviceNameInput.value == '') {
       device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         //   filters: [{
@@ -194,46 +197,42 @@ async function BLEManager() {
           '0000fef6-0000-1000-8000-00805f9b34fb'
         ]
       });
-  } else {
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{
-        name: deviceNameInput.value,
-      }]
-      // optionalServices: [
-      //   'e0262760-08c2-11e1-9073-0e8ac72e1001',
-      //   '0000fef6-0000-1000-8000-00805f9b34fb'
-    });
-  }
+    } else {
+      device = await navigator.bluetooth.requestDevice({
+        filters: [{
+          name: deviceNameInput.value,
+        }]
+        // optionalServices: [
+        //   'e0262760-08c2-11e1-9073-0e8ac72e1001',
+        //   '0000fef6-0000-1000-8000-00805f9b34fb'
+      });
+    }
 
     connectedDevice = await device.gatt.connect();
     // TODO: Update connection status
     logger('Connected to ' + device.name);
-    var charCount = 0;
-    var serviceCount = 0;
-
 
     try {
       logger('Getting Services...');
-      const services = await connectedDevice.getPrimaryServices();
+      const primaryServices = await connectedDevice.getPrimaryServices();
 
       logger('Getting Characteristics...');
-      // Services
-      for (const service of services) {
+      for (const service of primaryServices) {
         const characteristics = await service.getCharacteristics();
-        // Characteristics
-        var charArray = [];
-        characteristics.forEach(characteristic => {
+        let serviceUuid = service.uuid;
+        services[serviceUuid] = {
+          uuid: serviceUuid,
+          characteristics: [],
+          object: service
+        };
+        for (const characteristic of characteristics) {
           const properties = getSupportedProperties(characteristic);
-          charArray.push(new bleCharacteristic(
-              characteristic.uuid, charCount, properties));
-          charCount++;
-        });
-        serviceArray.push(new bleService(service.uuid, serviceCount));
-        serviceArray[serviceCount].characteristics.push(...charArray);
-        serviceCount++;
+          services[serviceUuid].characteristics.push(
+              {uuid: characteristic.uuid, properties, object: characteristic});
+        }
       }
-      console.log(serviceArray);
-      createAccordion(serviceArray);
+      console.log(services);
+      createAccordion(services);
     } catch (error) {
       loggerError(error);
     }
@@ -243,12 +242,6 @@ async function BLEManager() {
 
   } catch (error) {
     loggerError(error);
-    if (typeof device !== 'undefined') {
-      // TODO: Update connection status
-      // connectionStatus.textContent = 'Connection Status: FAILED';
-    } else {
-      // connectionStatus.textContent = 'Connection Status: CANCELLED';
-    }
   }
 }
 
@@ -618,17 +611,18 @@ function createAccordionItem(headerId, bodyId, headerText, bodyText) {
 }
 
 
-function createAccordion(serviceArray) {
+function createAccordion(services) {
   var accordion = document.getElementById('accordionExample');
   accordion.innerHTML = '';
-  for (const service of serviceArray) {
-    var headerText = 'Service : ' + uuids[service.uuid];
+  for (const serviceUuid in services) {
+    let service = services[serviceUuid];
+    var headerText = 'Service : ' + uuids[service.uuid] || service.uuid;
     if (!uuids[service.uuid]) {
       headerText = 'Service : ' + service.uuid;
     }
     var bodyText = createBodyText(service);
     var newAccordionItem = createAccordionItem(
-        'heading' + service.index, 'collapse' + service.index, headerText,
+        'heading' + service.uuid, 'collapse' + service.uuid, headerText,
         bodyText);
     accordion.insertAdjacentHTML('beforeend', newAccordionItem);
   }
@@ -638,15 +632,15 @@ function createBodyText(service) {
   var bodyText = '';
   for (const characteristic of service.characteristics) {
     var serviceName = uuids[service.uuid] || service.uuid;
-    var characteristicName =
-        uuids[characteristic.uuid] || characteristic.uuid;
+    var characteristicName = uuids[characteristic.uuid] || characteristic.uuid;
     var properties = characteristic.properties.split(',');
     var badges = '';
     var formCheckInput = '';
     var button = '';
     var formControl = '';
     for (const property of properties) {
-      if (property.includes('WRITEWITHOUTRESPONSE') || property.includes('WRITE')) {
+      if (property.includes('WRITEWITHOUTRESPONSE') ||
+          property.includes('WRITE')) {
         if (property.includes('WRITEWITHOUTRESPONSE')) {
           badges += `<span class="badge bg-warning ms-1">${
               property.replace('[', '').replace(']', '').replace(
@@ -655,35 +649,79 @@ function createBodyText(service) {
           badges += `<span class="badge bg-secondary ms-1">${
               property.replace('[', '').replace(']', '')}</span>`;
         }
-        button =
-            `<button type="button" class="btn btn-primary ms-1" onclick="console.log('${
-                characteristic.uuid}')">write</button>`;
-        formControl =
-            `<input class="form-control ms-1" id="deviceNameInput" placeholder="string to send">`;
+        let inputId = `input-${service.uuid}-${characteristic.uuid}`;
+        let buttonId = `button-${service.uuid}-${characteristic.uuid}`;
+        button = `<button type="button" class="btn btn-primary ms-1" id="${
+            buttonId}" onclick="writeButtonCallback('${inputId}', '${
+            service.uuid}', '${characteristic.uuid}')">write</button>`;
+        formControl = `<input class="form-control ms-1" id="${
+            inputId}" placeholder="string to send">`;
       } else if (property.includes('NOTIFY')) {
         badges += `<span class="badge bg-info ms-1">${
             property.replace('[', '').replace(']', '')}</span>`;
-        formCheckInput =
-            `<div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="${characteristic.uuid}" onchange="myCallback(this, '${characteristic.uuid}')" checked="">
-            <label class="form-check-label" for="${characteristic.uuid}">Enable Notify</label>
+        formCheckInput = `<div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="${
+            characteristic.uuid}" onchange="enableNotification(this, '${
+            characteristic.uuid}', '${service.uuid}')" >
+            <label class="form-check-label" for="${
+            characteristic.uuid}">Enable Notification</label>
           </div>`;
       } else {
         badges += `<span class="badge bg-primary ms-1">${
             property.replace('[', '').replace(']', '')}</span>`;
       }
     }
-    bodyText +=
-        `<div class="card border-info mb-3"><div class="card-header">${characteristicName}</div><div class="card-body"><div class="pb-3">${formCheckInput}</div><div class="d-flex">${formControl}${button}</div></div><div class="card-footer">${badges}</div></div>`;
+    bodyText += `<div class="card border-info mb-3"><div class="card-header">${
+        characteristicName}</div><div class="card-body"><div class="pb-3">${
+        formCheckInput}</div><div class="d-flex">${formControl}${
+        button}</div></div><div class="card-footer">${badges}</div></div>`;
   }
   return bodyText;
 }
-function myCallback(checkbox, uuid) {
+
+async function writeButtonCallback(inputId, serviceUuid, characteristicUuid) {
+  let inputValue = document.getElementById(inputId).value;
+  logger(`Input value: ${inputValue}, Service UUID: ${
+      serviceUuid}, Characteristic UUID: ${characteristicUuid}`);
+  try {
+    let characteristic =
+        services[serviceUuid]
+            .characteristics.find(c => c.uuid === characteristicUuid)
+            .object;
+    var uint8array = new TextEncoder().encode(inputValue);
+    await characteristic.writeValueWithoutResponse(uint8array);
+    logger('Value has been written');
+  } catch (error) {
+    loggerError(error);
+  }
+}
+function createGenericListener(charUuid) {
+  return function(event) {
+    // handle the event here
+    let value = event.target.value;
+    let dataRecevied = new TextDecoder().decode(value);
+    logger(`Notification : ${uuids[charUuid]} : ${dataRecevied} `);
+    // logger(`Notification : ${uuids[charUuid]} : ${event.target.value} `);
+  }
+}
+async function enableNotification(checkbox, charUuid, serviceUuid) {
   if (checkbox.checked) {
-    logger('Checkbox with ID ' + uuid + ' is checked!');
+    if (!enabledNotifications.has(charUuid)) {
+      let service = services[serviceUuid].object;
+      let char = services[serviceUuid]
+                     .characteristics.find(c => c.uuid === charUuid)
+                     .object;
+      var genericListener = createGenericListener(charUuid);
+      char.addEventListener('characteristicvaluechanged', genericListener);
+      await char.startNotifications();
+      logger('Notification enabled for ' + uuids[charUuid]);
+      enabledNotifications.add(charUuid);
+    } else {
+      logger('Notification already enabled for ' + uuids[charUuid]);
+    }
   } else {
     // Checkbox is not checked
-    logger('Checkbox with ID ' + uuid + ' is not checked!');
+    logger('Checkbox with ID ' + charUuid + ' is not checked!');
   }
 }
 function addNewAccordionItems(myStructArray) {
