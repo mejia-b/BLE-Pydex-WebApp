@@ -211,95 +211,127 @@
         </div>
      </div>
      <!-- AREA NEXT TO SIDE BAR -->
-     <main>
-     <!-- class is set to "container-fluid" which is a bootstrap property and allows the div to take up all width" -->
-     <div id="main-area" class="container-fluid" style="border: solid blue;">
-        <!-- FIRST ROW -->
-        <div class="row">
-             <!-- MAIN AREA -->
-             <div class="card mb-3 mt-5 pb-3 col-small-7 col-md-7 col-lg-4" id="connection">
-              <h6 class="card-header"><strong>Connection</strong></h6>
+     <div id="main">
+      <!-- class is set to "container-fluid" which is a bootstrap property and allows the div to take up all width" -->
+      <div class="container-fluid" style="border: solid blue;">
+          <!-- FIRST ROW -->
+          <div class="row">
+              <!-- MAIN AREA -->
+              <div class="card mb-3 mt-5 pb-3 col-md-3 col-lg-4" id="connection">
+                <h6 class="card-header"><strong>Connection</strong></h6>
+                <div class="card-body">
+                </div>
+
+                <!-- INPUT BOXES AND BUTTONS -->
+                <!-- Device Name -->
+                <div class="row ms-1">
+                  <div class="col-5">
+                    <input class="form-control" id="deviceNameInput" placeholder="Enter device name">
+                  </div>
+                  <div class="col-1"></div>
+                  <div class="col-2">
+                    <button class="button blue" type="button" id="connectButton"><span>Connect</span></button>
+                  </div>
+                </div>
+
+                <!-- Send data to ARM PROP -->
+                <div class="row ms-1">
+                  <div class="col-5 gy-4">
+                    <input class="form-control" id="stringToSendInput" placeholder="String to send">
+                  </div>
+                  <div class="col-1"></div>
+                  <div class="col-2 gy-4">
+                    <button class="button blue" type="button" id="sendButton"><span>Send</span></button>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- GATT server card -->
+              <div class="card mb-3 mt-5 col-md-3 col-lg-4" id="gatt-server">
+                <h6 class="card-header"><strong>GATT Server</strong></h6>
+    
+                <!-----------------------------------------Start of accordion -->
+                <div class="accordion" id="accordionExample">
+    
+                </div>
+                <!-----------------------------------------END of accordion -->
+                <div class="card-body">
+    
+                </div>
+                <div class="card-footer text-muted">
+    
+                </div>
+              </div>
+          </div>
+          <!-- SECOND ROW -->
+          <div class="row" >
+            <!-- OTA CARD -->
+            <div class="card mb-3 mt-3 col-small-7 col-md-7 col-lg-4" id="OTAUpdateCard" hidden>
+              <h6 class="card-header"><strong>OTA Update</strong></h6>
               <div class="card-body">
-              </div>
-
-              <!-- INPUT BOXES AND BUTTONS -->
-              <!-- Device Name -->
-              <div class="row ms-1">
-                <div class="col-5">
-                  <input class="form-control" id="deviceNameInput" placeholder="Enter device name">
-                </div>
-                <div class="col-1"></div>
-                <div class="col-2">
-                  <button class="button blue" type="button" id="connectButton"><span>Connect</span></button>
-                </div>
-              </div>
-
-              <!-- Send data to ARM PROP -->
-              <div class="row ms-1">
-                <div class="col-5 gy-4">
-                  <input class="form-control" id="stringToSendInput" placeholder="String to send">
-                </div>
-                <div class="col-1"></div>
-                <div class="col-2 gy-4">
-                  <button class="button blue" type="button" id="sendButton"><span>Send</span></button>
-                </div>
-              </div>
-
-             </div>
-        </div>
-        <!-- SECOND ROW -->
-        <div class="row" >
-           <!-- OTA CARD -->
-           <div class="card mb-3 mt-3 col-small-7 col-md-7 col-lg-4" id="OTAUpdateCard">
-            <h6 class="card-header"><strong>OTA Update</strong></h6>
-            <div class="card-body">
-              <!-- CHOOSE FILE BUTTON -->
-              <form>
-                <fieldset>
-                  <div class="form-group">
-                    <input class="form-control" type="file" id="choseFileButton">
+                <!-- CHOOSE FILE BUTTON -->
+                <form>
+                  <fieldset>
+                    <div class="form-group">
+                      <input class="form-control" type="file" id="choseFileButton">
+                    </div>
+                  </fieldset>
+                </form>
+                <div class="row">
+                  <!-- START UPDATE BUTTON -->
+                  <div class="row ">
+                    <div class="col-4 gy-4">
+                      <button id="startUpdateButton" class="button blue" type="button"
+                        style="--bs-btn-bg: #09c1fe;"><span>Start
+                          update</span></button>
+                    </div>
                   </div>
-                </fieldset>
-              </form>
-              <div class="row">
-                <!-- START UPDATE BUTTON -->
-                <div class="row ">
-                  <div class="col-4 gy-4">
-                    <button id="startUpdateButton" class="button blue" type="button"
-                      style="--bs-btn-bg: #09c1fe;"><span>Start
-                        update</span></button>
-                  </div>
-                </div>
-                <!-- PROGRESS BAR -->
-                <div class="row ">
-                  <div class="col-8 gy-4">
-                    <figure>
-                      <blockquote class="blockquote">
-                        <p class="mb-0">75% Uploaded</p>
+                  <!-- PROGRESS BAR -->
+                  <div class="row ">
+                    <div class="col-8 gy-4">
+                      <figure>
+                        <blockquote class="blockquote">
+                          <p class="mb-0">75% Uploaded</p>
 
-                      </blockquote>
+                        </blockquote>
 
-                    </figure>
-                    <div class="progress">
-                      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
-                        aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
+                      </figure>
+                      <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                          aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <br></br>
-              <!-- ALERT -->
-              <div class="alert alert-dismissible alert-danger">
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
-                runinng the BLE_otas example using external flash.
+                <br></br>
+                <!-- ALERT -->
+                <div class="alert alert-dismissible alert-danger">
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
+                  runinng the BLE_otas example using external flash.
+                </div>
               </div>
             </div>
-           </div>
-        </div>
-     <!-- end of container-fluid  -->
-     </div>
-     </main>
+          </div>
+
+          <!-- THIRD ROW -->
+          <div class="row">
+            <!-- LOGS CARD -->
+            <div class="log col-md-4 pb-3">
+              <form>
+                <div class="form-group">
+                  <label for="logArea" class="form-label mt-4">Logs</label>
+                  <textarea class="form-control" id="logArea" rows="5"></textarea>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+      <!-- end of container-fluid  -->
+      </div>
+    </div>
   </div>
 
   <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
