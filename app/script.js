@@ -655,11 +655,13 @@ function createBodyText(service) {
           badges += `<span class="badge bg-secondary ms-1">${
               property.replace('[', '').replace(']', '')}</span>`;
         }
-        button =
-            `<button type="button" class="btn btn-primary ms-1" onclick="console.log('${
-                characteristic.uuid}')">write</button>`;
-        formControl =
-            `<input class="form-control ms-1" id="deviceNameInput" placeholder="string to send">`;
+        let inputId = `input-${service.uuid}-${characteristic.uuid}`;
+        let buttonId = `button-${service.uuid}-${characteristic.uuid}`;
+        button = `<button type="button" class="btn btn-primary ms-1" id="${
+            buttonId}" onclick="writeButtonCallback('${inputId}', '${
+            service.uuid}', '${characteristic.uuid}')">write</button>`;
+        formControl = `<input class="form-control ms-1" id="${
+            inputId}" placeholder="string to send">`;
       } else if (property.includes('NOTIFY')) {
         badges += `<span class="badge bg-info ms-1">${
             property.replace('[', '').replace(']', '')}</span>`;
@@ -681,6 +683,12 @@ function createBodyText(service) {
         button}</div></div><div class="card-footer">${badges}</div></div>`;
   }
   return bodyText;
+}
+
+function writeButtonCallback(inputId, serviceUuid, characteristicUuid) {
+  let inputValue = document.getElementById(inputId).value;
+  logger(`Input value: ${inputValue}, Service UUID: ${
+      serviceUuid}, Characteristic UUID: ${characteristicUuid}`);
 }
 function createGenericListener(charUuid) {
   return function(event) {
