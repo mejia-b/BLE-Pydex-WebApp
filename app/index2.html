@@ -139,6 +139,7 @@
 </svg>
 
 <body>
+  <!-- This div with a class of "wrapper" is a flexbox container and is the first one enclosing all other elements of the page -->
   <div class="wrapper">
      <!-- SIDE BAR -->
      <div id="sidebar" class="d-flex flex-column flex-shrink p-3 bg-light" style="width: 280px;">
@@ -209,15 +210,16 @@
             </ul>
         </div>
      </div>
-     <div class="container-fluid" style="border: solid blue;">
+     <!-- AREA NEXT TO SIDE BAR -->
+     <main>
+     <!-- class is set to "container-fluid" which is a bootstrap property and allows the div to take up all width" -->
+     <div id="main-area" class="container-fluid" style="border: solid blue;">
         <!-- FIRST ROW -->
         <div class="row">
              <!-- MAIN AREA -->
              <div class="card mb-3 mt-5 pb-3 col-small-7 col-md-7 col-lg-4" id="connection">
-              <h4 class="card-header">Connection</h4>
+              <h6 class="card-header"><strong>Connection</strong></h6>
               <div class="card-body">
-                <h5 class="card-title">Special title treatment</h5>
-                <h6 class="card-subtitle text-muted">Support card subtitle</h6>
               </div>
 
               <!-- INPUT BOXES AND BUTTONS -->
@@ -243,24 +245,61 @@
                 </div>
               </div>
 
-              <!-- Send Binary and file chooser -->
-
              </div>
         </div>
         <!-- SECOND ROW -->
         <div class="row" >
            <!-- OTA CARD -->
-           <div class="card mt-3 col-small-7 col-md-7 col-lg-4" id="bottom-left-card">
+           <div class="card mb-3 mt-3 col-small-7 col-md-7 col-lg-4" id="OTAUpdateCard">
+            <h6 class="card-header"><strong>OTA Update</strong></h6>
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
-              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              <a href="#" class="card-link">Card link</a>
-              <a href="#" class="card-link">Another link</a>
+              <!-- CHOOSE FILE BUTTON -->
+              <form>
+                <fieldset>
+                  <div class="form-group">
+                    <input class="form-control" type="file" id="choseFileButton">
+                  </div>
+                </fieldset>
+              </form>
+              <div class="row">
+                <!-- START UPDATE BUTTON -->
+                <div class="row ">
+                  <div class="col-4 gy-4">
+                    <button id="startUpdateButton" class="button blue" type="button"
+                      style="--bs-btn-bg: #09c1fe;"><span>Start
+                        update</span></button>
+                  </div>
+                </div>
+                <!-- PROGRESS BAR -->
+                <div class="row ">
+                  <div class="col-8 gy-4">
+                    <figure>
+                      <blockquote class="blockquote">
+                        <p class="mb-0">75% Uploaded</p>
+
+                      </blockquote>
+
+                    </figure>
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                        aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br></br>
+              <!-- ALERT -->
+              <div class="alert alert-dismissible alert-danger">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>Heads up!</strong> OTA firmware update will only work with MAX32xxx Microcontrollers
+                runinng the BLE_otas example using external flash.
+              </div>
             </div>
            </div>
         </div>
+     <!-- end of container-fluid  -->
      </div>
+     </main>
   </div>
 
   <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
