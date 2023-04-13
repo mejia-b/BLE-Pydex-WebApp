@@ -18,10 +18,8 @@ crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
-const charArray = [];
-const serviceArray = [];
 charCallBackCount = 0;
-charCallBacks = [10];
+charCallBacks = [20];
 //---------- File chooser ----------
 const choseFileButton = document.getElementById('choseFileButton');
 choseFileButton.addEventListener('change', function() {
@@ -33,27 +31,51 @@ choseFileButton.addEventListener('change', function() {
 const reader = new FileReader();
 
 //---------- BLE objects ----------
-class bleCharacteristic {
-  constructor(uuid, index, properties) {
-    this.uuid = uuid;
-    this.index = index;
-    this.properties = properties;
+class Services {
+  constructor() {
+    this.services = {};
+  }
+
+  addService(serviceUuid, serviceObject) {
+    this.services[serviceUuid] = {
+      object: serviceObject,
+      characteristics: [],
+      listener: null
+    };
+  }
+
+  addCharacteristic(serviceUuid, charUuid, charPorperties, charObject) {
+    this.services[serviceUuid].characteristics.push({
+      uuid: charUuid,
+      properties: charPorperties,
+      object: charObject
+    });
+  }
+
+  setListener(serviceUuid, listener) {
+    this.services[serviceUuid].listener = listener;
+  }
+
+  getService(serviceUuid) {
+    return this.services[serviceUuid];
+  }
+
+  getCharacteristic(serviceUuid, charUuid) {
+    return this.services[serviceUuid].characteristics.find(c => c.uuid === charUuid);
+  }
+
+  getListener(serviceUuid) {
+    return this.services[serviceUuid].listener;
+  }
+
+  clear() {
+    this.services = {};
   }
 }
-
-class bleService {
-  constructor(uuid, index) {
-    this.uuid = uuid;
-    this.index = index;
-    this.characteristics = [];
-  }
-}
-
-let services = {};
 let enabledNotifications = new Set();
 let connectedDevice = null;
 let device = null;
-
+let deviceServer = new Services();
 // Here you can add more UUIDs per your application needs
 const uuids = {
   '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access Profile',
@@ -209,6 +231,11 @@ async function BLEManager() {
     }
 
     connectedDevice = await device.gatt.connect();
+    try {
+    device.addEventListener('gattserverdisconnected', onDisconnected);
+    } catch (error) {
+      loggerError(error);
+    }
     // TODO: Update connection status
     logger('Connected to ' + device.name);
 
@@ -217,24 +244,19 @@ async function BLEManager() {
       const primaryServices = await connectedDevice.getPrimaryServices();
 
       logger('Getting Characteristics...');
+     
       for (const service of primaryServices) {
         const characteristics = await service.getCharacteristics();
         let serviceUuid = service.uuid;
-        services[serviceUuid] = {
-          uuid: serviceUuid,
-          characteristics: [],
-          object: service
-        };
+        deviceServer.addService(serviceUuid, service);
         for (const characteristic of characteristics) {
           const properties = getSupportedProperties(characteristic);
-          services[serviceUuid].characteristics.push(
-              {uuid: characteristic.uuid, properties, object: characteristic});
+          deviceServer.addCharacteristic(serviceUuid, characteristic.uuid, properties, characteristic);
         }
       }
-      console.log(services);
-      createAccordion(services);
+      createAccordion(deviceServer);
     } catch (error) {
-      loggerError(error);
+      loggerError('here ' + error);
     }
 
     await checkIfConnectedToOTAS();
@@ -244,8 +266,53 @@ async function BLEManager() {
     loggerError(error);
   }
 }
+function onDisconnected(event) {
+  // TODO : lots of variable cleanup
+  logger('> Bluetooth Device disconnected');
+  clearAccordion('accordionExample');
+  removeAllEventListeners(deviceServer);
+  resetGlobals();
 
+  //OTAS rellated
+  connectedToOTAS = false;
+  OTAUpdateCard.setAttribute('hidden', true);
+  document.querySelector('.progress-bar').setAttribute('aria-valuenow', 0);
+  document.querySelector('.progress-bar').style.width = 0 + '%';
+  document.querySelector('.blockquote p').textContent = 0 + '% Uploaded';
 
+  
+
+}
+async function removeAllEventListeners(servicesInstance) {
+  for (let serviceUuid in servicesInstance.services) {
+    let service = servicesInstance.getService(serviceUuid);
+    for (let characteristic of service.characteristics) {
+      if (enabledNotifications.has(characteristic.uuid)) {
+        let char = characteristic.object;
+        let genericListener = service.listener;
+        char.removeEventListener('characteristicvaluechanged', genericListener);
+        await char.stopNotifications();
+        logger('Notification disabled for ' + uuids[characteristic.uuid]);
+        enabledNotifications.delete(characteristic.uuid);
+      }
+    }
+  }
+  servicesInstance.clear();
+}
+
+function resetGlobals() {
+  crc32bytes = new Uint8Array(4);
+  fileSize = 0;
+  fileBuffer = [];
+  adrdressNum = 0;
+  charCallBackCount = 0;
+  charCallBacks = [20];
+
+  enabledNotifications = new Set();
+  connectedDevice = null;
+  device = null;
+  deviceServer = new Services();
+}
 async function sendBLEData() {
   // TODO this needs to be generic
   logger('Sending: ');
@@ -302,7 +369,7 @@ function handleNotifications_arm_prop_data(event) {
 }
 
 async function checkIfConnectedToOTAS() {
-  if (device.name === 'XTAS') {
+  if (device.name === 'OTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
         'e0262760-08c2-11e1-9073-0e8ac72e1001');
@@ -433,6 +500,7 @@ function handleNotifications_wdxs_otas() {
       logger('OTAS_SEND_VERIFY_REQ_STATE');
       OTAS_CURRENT_STATE++;
       sendVerifyRequest();
+      //TODO : only sent reset request if verify state is success == 0
       break;
 
     case OTAS_SEND_RESET_STATE:
@@ -509,22 +577,20 @@ async function sendPutRequest() {
 }
 
 async function sendFile() {
-  // send fileBuffer to WDX in chunks of 224 bytes
+ 
   var chunkSize = 220;
   var adrdressNum = 0;
   var addressBytes = new Uint8Array(4);
   // /const fileBuffer = reader.result;
   var chunkCount = Math.ceil(fileBuffer.length / chunkSize);
-  // TODO : calculate how many bytes are left to send after chunkCount is done
-  // and send the remaining bytes.
-  // set addressNum into addressBytes in little endian format
+ 
   addressBytes[0] = 0;
   addressBytes[1] = 0;
   addressBytes[2] = 0;
   addressBytes[3] = 0;
   exit = false;
 
-  //  while (adrdressNum < fileBuffer.length) {
+ 
   var intervalId = setInterval(function() {
     if ((adrdressNum + chunkSize) > fileSize) {  // last chunk
       // send remaining bytes
@@ -554,12 +620,17 @@ async function sendFile() {
     addressBytes[1] = (adrdressNum >> 8) & 0xff;
     addressBytes[2] = (adrdressNum >> 16) & 0xff;
     addressBytes[3] = (adrdressNum >> 24) & 0xff;
+
+    // Update progress bar and blockquote element
+    var progress = (adrdressNum / fileSize) * 100;
+    document.querySelector('.progress-bar').setAttribute('aria-valuenow', progress);
+    document.querySelector('.progress-bar').style.width = progress + '%';
+    document.querySelector('.blockquote p').textContent = progress.toFixed(0) + '% Uploaded';
+
     if (exit) {
       clearInterval(intervalId);
     }
   }, 10);
-
-  // handleNotifications_wdxs_otas();
 }
 
 async function sendVerifyRequest() {
@@ -590,7 +661,13 @@ async function sendPacketFunction() {
   sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true);
   logger('Sent packet to verify file' + packetToSend);
 }
-
+function clearAccordion(accordionId) {
+  var accordion = document.querySelector('#' + accordionId);
+  var items = accordion.querySelectorAll('.accordion-item');
+  items.forEach(function(item) {
+    item.remove();
+  });
+}
 function createAccordionItem(headerId, bodyId, headerText, bodyText) {
   var newItem = `
   <div class="accordion-item">
@@ -611,29 +688,34 @@ function createAccordionItem(headerId, bodyId, headerText, bodyText) {
 }
 
 
-function createAccordion(services) {
+function createAccordion(servicesInstance) {
   var accordion = document.getElementById('accordionExample');
   accordion.innerHTML = '';
-  for (const serviceUuid in services) {
-    let service = services[serviceUuid];
-    var headerText = 'Service : ' + uuids[service.uuid] || service.uuid;
-    if (!uuids[service.uuid]) {
-      headerText = 'Service : ' + service.uuid;
-    }
-    var bodyText = createBodyText(service);
+  for (const serviceUuid in servicesInstance.services) {
+    let service = servicesInstance.getService(serviceUuid);
+    var headerText = 'Service : ' + (uuids[serviceUuid] || serviceUuid);
+    var bodyText = createBodyText(serviceUuid);
     var newAccordionItem = createAccordionItem(
-        'heading' + service.uuid, 'collapse' + service.uuid, headerText,
+        'heading' + serviceUuid, 'collapse' + serviceUuid, headerText,
         bodyText);
     accordion.insertAdjacentHTML('beforeend', newAccordionItem);
   }
 }
 
-function createBodyText(service) {
+function createBodyText(serviceUuid) {
   var bodyText = '';
+  var service = deviceServer.getService(serviceUuid);
   for (const characteristic of service.characteristics) {
-    var serviceName = uuids[service.uuid] || service.uuid;
-    var characteristicName = uuids[characteristic.uuid] || characteristic.uuid;
-    var properties = characteristic.properties.split(',');
+    var characteristicName = (uuids[characteristic.uuid] || characteristic.uuid);
+    
+    if (characteristic.properties) {
+      var properties = characteristic.properties.split(',');
+      logger('properties: ' + properties);
+      // rest of the code
+    } else {
+      logger("something went wrong: " + characteristic.properties);
+      // handle the case where characteristic.properties is undefined
+    }    
     var badges = '';
     var formCheckInput = '';
     var button = '';
@@ -649,11 +731,11 @@ function createBodyText(service) {
           badges += `<span class="badge bg-secondary ms-1">${
               property.replace('[', '').replace(']', '')}</span>`;
         }
-        let inputId = `input-${service.uuid}-${characteristic.uuid}`;
-        let buttonId = `button-${service.uuid}-${characteristic.uuid}`;
+        let inputId = `input-${serviceUuid}-${characteristic.uuid}`;
+        let buttonId = `button-${serviceUuid}-${characteristic.uuid}`;
         button = `<button type="button" class="btn btn-primary ms-1" id="${
             buttonId}" onclick="writeButtonCallback('${inputId}', '${
-            service.uuid}', '${characteristic.uuid}')">write</button>`;
+              serviceUuid}', '${characteristic.uuid}')">write</button>`;
         formControl = `<input class="form-control ms-1" id="${
             inputId}" placeholder="string to send">`;
       } else if (property.includes('NOTIFY')) {
@@ -662,7 +744,7 @@ function createBodyText(service) {
         formCheckInput = `<div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="${
             characteristic.uuid}" onchange="enableNotification(this, '${
-            characteristic.uuid}', '${service.uuid}')" >
+            characteristic.uuid}', '${serviceUuid}')" >
             <label class="form-check-label" for="${
             characteristic.uuid}">Enable Notification</label>
           </div>`;
@@ -684,10 +766,7 @@ async function writeButtonCallback(inputId, serviceUuid, characteristicUuid) {
   logger(`Input value: ${inputValue}, Service UUID: ${
       serviceUuid}, Characteristic UUID: ${characteristicUuid}`);
   try {
-    let characteristic =
-        services[serviceUuid]
-            .characteristics.find(c => c.uuid === characteristicUuid)
-            .object;
+    let characteristic = deviceServer.getCharacteristic(serviceUuid, characteristicUuid).object;
     var uint8array = new TextEncoder().encode(inputValue);
     await characteristic.writeValueWithoutResponse(uint8array);
     logger('Value has been written');
@@ -695,23 +774,22 @@ async function writeButtonCallback(inputId, serviceUuid, characteristicUuid) {
     loggerError(error);
   }
 }
-function createGenericListener(charUuid) {
-  return function(event) {
+function createGenericListener(charUuid, serviceUuid) {
+  let genericListener = function(event) {
     // handle the event here
     let value = event.target.value;
     let dataRecevied = new TextDecoder().decode(value);
     logger(`Notification : ${uuids[charUuid]} : ${dataRecevied} `);
-    // logger(`Notification : ${uuids[charUuid]} : ${event.target.value} `);
   }
+  deviceServer.setListener(serviceUuid, genericListener);
+  return genericListener;
 }
 async function enableNotification(checkbox, charUuid, serviceUuid) {
   if (checkbox.checked) {
     if (!enabledNotifications.has(charUuid)) {
-      let service = services[serviceUuid].object;
-      let char = services[serviceUuid]
-                     .characteristics.find(c => c.uuid === charUuid)
-                     .object;
-      var genericListener = createGenericListener(charUuid);
+      let service = deviceServer.getService(serviceUuid).object;
+      let char = deviceServer.getCharacteristic(serviceUuid, charUuid).object;
+      var genericListener = createGenericListener(charUuid, serviceUuid);
       char.addEventListener('characteristicvaluechanged', genericListener);
       await char.startNotifications();
       logger('Notification enabled for ' + uuids[charUuid]);
@@ -720,8 +798,17 @@ async function enableNotification(checkbox, charUuid, serviceUuid) {
       logger('Notification already enabled for ' + uuids[charUuid]);
     }
   } else {
-    // Checkbox is not checked
-    logger('Checkbox with ID ' + charUuid + ' is not checked!');
+    // remove eventlistener
+    if (enabledNotifications.has(charUuid)) {
+      let char = deviceServer.getCharacteristic(serviceUuid, charUuid).object;
+      let genericListener = deviceServer.getListener(serviceUuid);
+      char.removeEventListener('characteristicvaluechanged', genericListener);
+      await char.stopNotifications();
+      logger('Notification disabled for ' + uuids[charUuid]);
+      enabledNotifications.delete(charUuid);
+    } else {
+      logger('Notification already disabled for ' + uuids[charUuid]);
+    }
   }
 }
 function addNewAccordionItems(myStructArray) {
@@ -734,12 +821,12 @@ function addNewAccordionItems(myStructArray) {
     const bodyText = item.index;
     const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
     accordion.insertAdjacentHTML('beforeend', newItem);
-    const currentIndex = charCallBackCount;
-    charCallBacks[currentIndex] = document.getElementById(bodyId);
-    charCallBacks[currentIndex].addEventListener('click', () => {
-      buttonCB(currentIndex);
-    });
-    charCallBackCount++;
+
+  });
+}
+function removeEventListeners(charCallBacks) {
+  charCallBacks.forEach(function(callback) {
+    callback.characteristic.removeEventListener('characteristicvaluechanged', callback.callback);
   });
 }
 function buttonCB(id) {
