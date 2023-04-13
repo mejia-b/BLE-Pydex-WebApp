@@ -18,8 +18,6 @@ crc32bytes = new Uint8Array(4);
 fileSize = 0;
 fileBuffer = [];
 adrdressNum = 0;
-const charArray = [];
-const serviceArray = [];
 charCallBackCount = 0;
 charCallBacks = [10];
 //---------- File chooser ----------
@@ -68,8 +66,8 @@ const uuids = {
   '005f0004-2ff2-4ed5-b045-4c7463617865':
       'WDX File Transfer Data Characteristic',
   '005f0005-2ff2-4ed5-b045-4c7463617865': 'WDX Authentication Characteristic',
-  'e0262760-08c2-11e1-9073-0e8ac72e1001': 'ARM Prop. Data Service',
-  'e0262760-08c2-11e1-9073-0e8ac72e0001': 'ARM Prop. Data Characteristic',
+ // 'e0262760-08c2-11e1-9073-0e8ac72e1001': 'ARM Prop. Data Service',
+ // 'e0262760-08c2-11e1-9073-0e8ac72e0001': 'ARM Prop. Data Characteristic',
 
   // Add more UUIDs here
 };
@@ -209,6 +207,7 @@ async function BLEManager() {
     }
 
     connectedDevice = await device.gatt.connect();
+    device.addEventListener('gattserverdisconnected', onDisconnected);
     // TODO: Update connection status
     logger('Connected to ' + device.name);
 
@@ -244,7 +243,11 @@ async function BLEManager() {
     loggerError(error);
   }
 }
-
+function onDisconnected(event) {
+  // TODO : lots of variable cleanup
+  logger('> Bluetooth Device disconnected');
+  clearAccordion('accordionExample');
+}
 
 async function sendBLEData() {
   // TODO this needs to be generic
@@ -302,7 +305,7 @@ function handleNotifications_arm_prop_data(event) {
 }
 
 async function checkIfConnectedToOTAS() {
-  if (device.name === 'XTAS') {
+  if (device.name === 'OTAS') {
     // Discover ARMPropService
     armPropDataService = await connectedDevice.getPrimaryService(
         'e0262760-08c2-11e1-9073-0e8ac72e1001');
@@ -433,6 +436,7 @@ function handleNotifications_wdxs_otas() {
       logger('OTAS_SEND_VERIFY_REQ_STATE');
       OTAS_CURRENT_STATE++;
       sendVerifyRequest();
+      //TODO : only sent reset request if verify state is success == 0
       break;
 
     case OTAS_SEND_RESET_STATE:
@@ -509,22 +513,20 @@ async function sendPutRequest() {
 }
 
 async function sendFile() {
-  // send fileBuffer to WDX in chunks of 224 bytes
+ 
   var chunkSize = 220;
   var adrdressNum = 0;
   var addressBytes = new Uint8Array(4);
   // /const fileBuffer = reader.result;
   var chunkCount = Math.ceil(fileBuffer.length / chunkSize);
-  // TODO : calculate how many bytes are left to send after chunkCount is done
-  // and send the remaining bytes.
-  // set addressNum into addressBytes in little endian format
+ 
   addressBytes[0] = 0;
   addressBytes[1] = 0;
   addressBytes[2] = 0;
   addressBytes[3] = 0;
   exit = false;
 
-  //  while (adrdressNum < fileBuffer.length) {
+ 
   var intervalId = setInterval(function() {
     if ((adrdressNum + chunkSize) > fileSize) {  // last chunk
       // send remaining bytes
@@ -554,12 +556,17 @@ async function sendFile() {
     addressBytes[1] = (adrdressNum >> 8) & 0xff;
     addressBytes[2] = (adrdressNum >> 16) & 0xff;
     addressBytes[3] = (adrdressNum >> 24) & 0xff;
+
+    // Update progress bar and blockquote element
+    var progress = (adrdressNum / fileSize) * 100;
+    document.querySelector('.progress-bar').setAttribute('aria-valuenow', progress);
+    document.querySelector('.progress-bar').style.width = progress + '%';
+    document.querySelector('.blockquote p').textContent = progress.toFixed(0) + '% Uploaded';
+
     if (exit) {
       clearInterval(intervalId);
     }
   }, 10);
-
-  // handleNotifications_wdxs_otas();
 }
 
 async function sendVerifyRequest() {
@@ -590,7 +597,13 @@ async function sendPacketFunction() {
   sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true);
   logger('Sent packet to verify file' + packetToSend);
 }
-
+function clearAccordion(accordionId) {
+  var accordion = document.querySelector('#' + accordionId);
+  var items = accordion.querySelectorAll('.accordion-item');
+  items.forEach(function(item) {
+    item.remove();
+  });
+}
 function createAccordionItem(headerId, bodyId, headerText, bodyText) {
   var newItem = `
   <div class="accordion-item">
@@ -616,7 +629,7 @@ function createAccordion(services) {
   accordion.innerHTML = '';
   for (const serviceUuid in services) {
     let service = services[serviceUuid];
-    var headerText = 'Service : ' + uuids[service.uuid] || service.uuid;
+    var headerText = 'Service : ' + (uuids[service.uuid] || service.uuid);
     if (!uuids[service.uuid]) {
       headerText = 'Service : ' + service.uuid;
     }
@@ -631,7 +644,6 @@ function createAccordion(services) {
 function createBodyText(service) {
   var bodyText = '';
   for (const characteristic of service.characteristics) {
-    var serviceName = uuids[service.uuid] || service.uuid;
     var characteristicName = uuids[characteristic.uuid] || characteristic.uuid;
     var properties = characteristic.properties.split(',');
     var badges = '';
@@ -700,7 +712,7 @@ function createGenericListener(charUuid) {
     // handle the event here
     let value = event.target.value;
     let dataRecevied = new TextDecoder().decode(value);
-    logger(`Notification : ${uuids[charUuid]} : ${dataRecevied} `);
+    logger(`Notification : ${(uuids[charUuid] || charUuid)} : ${dataRecevied} `);
     // logger(`Notification : ${uuids[charUuid]} : ${event.target.value} `);
   }
 }
@@ -712,16 +724,29 @@ async function enableNotification(checkbox, charUuid, serviceUuid) {
                      .characteristics.find(c => c.uuid === charUuid)
                      .object;
       var genericListener = createGenericListener(charUuid);
+      services[serviceUuid].listener = genericListener;
       char.addEventListener('characteristicvaluechanged', genericListener);
       await char.startNotifications();
-      logger('Notification enabled for ' + uuids[charUuid]);
+      logger('Notification enabled for ' + (uuids[charUuid] || charUuid));
       enabledNotifications.add(charUuid);
     } else {
-      logger('Notification already enabled for ' + uuids[charUuid]);
+      logger('Notification already enabled for ' + (uuids[charUuid] || charUuid));
     }
   } else {
-    // Checkbox is not checked
-    logger('Checkbox with ID ' + charUuid + ' is not checked!');
+    // remove eventlistener
+    if (enabledNotifications.has(charUuid)) {
+      let char = services[serviceUuid]
+                    .characteristics.find(c => c.uuid === charUuid)
+                    .object;
+      let genericListener = services[serviceUuid].listener;
+      char.removeEventListener('characteristicvaluechanged', genericListener);
+      await char.stopNotifications();
+      logger('Notification disabled for ' + (uuids[charUuid] || charUuid));
+      enabledNotifications.delete(charUuid);
+    } else {
+      logger('Notification already disabled for ' + (uuids[charUuid] || charUuid));
+    }    
+    
   }
 }
 function addNewAccordionItems(myStructArray) {
@@ -734,12 +759,12 @@ function addNewAccordionItems(myStructArray) {
     const bodyText = item.index;
     const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText);
     accordion.insertAdjacentHTML('beforeend', newItem);
-    const currentIndex = charCallBackCount;
-    charCallBacks[currentIndex] = document.getElementById(bodyId);
-    charCallBacks[currentIndex].addEventListener('click', () => {
-      buttonCB(currentIndex);
-    });
-    charCallBackCount++;
+
+  });
+}
+function removeEventListeners(charCallBacks) {
+  charCallBacks.forEach(function(callback) {
+    callback.characteristic.removeEventListener('characteristicvaluechanged', callback.callback);
   });
 }
 function buttonCB(id) {
