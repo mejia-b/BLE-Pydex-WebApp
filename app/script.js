@@ -272,6 +272,16 @@ function onDisconnected(event) {
   clearAccordion('accordionExample');
   removeAllEventListeners(deviceServer);
   resetGlobals();
+
+  //OTAS rellated
+  connectedToOTAS = false;
+  OTAUpdateCard.setAttribute('hidden', true);
+  document.querySelector('.progress-bar').setAttribute('aria-valuenow', 0);
+  document.querySelector('.progress-bar').style.width = 0 + '%';
+  document.querySelector('.blockquote p').textContent = 0 + '% Uploaded';
+
+  
+
 }
 async function removeAllEventListeners(servicesInstance) {
   for (let serviceUuid in servicesInstance.services) {
