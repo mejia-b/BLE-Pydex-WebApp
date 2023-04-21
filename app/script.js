@@ -1,4 +1,4 @@
-// super linter test
+// super linter test #2
 //---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput');
 const stringToSend = document.getElementById('stringToSendInput');
