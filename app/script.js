@@ -37,13 +37,40 @@ class bleCharacteristic {
     this.index = index
     this.properties = properties
   }
-}
 
 class bleService {
   constructor (uuid, index) {
     this.uuid = uuid
     this.index = index
     this.characteristics = []
+  }
+
+  addCharacteristic(serviceUuid, charUuid, charPorperties, charObject) {
+    this.services[serviceUuid].characteristics.push({
+      uuid: charUuid,
+      properties: charPorperties,
+      object: charObject
+    });
+  }
+
+  setListener(serviceUuid, listener) {
+    this.services[serviceUuid].listener = listener;
+  }
+
+  getService(serviceUuid) {
+    return this.services[serviceUuid];
+  }
+
+  getCharacteristic(serviceUuid, charUuid) {
+    return this.services[serviceUuid].characteristics.find(c => c.uuid === charUuid);
+  }
+
+  getListener(serviceUuid) {
+    return this.services[serviceUuid].listener;
+  }
+
+  clear() {
+    this.services = {};
   }
 }
 
@@ -236,6 +263,12 @@ async function BLEManager () {
     loggerError(error)
   }
 }
+function onDisconnected(event) {
+  // TODO : lots of variable cleanup
+  logger('> Bluetooth Device disconnected');
+  clearAccordion('accordionExample');
+  removeAllEventListeners(deviceServer);
+  resetGlobals();
 
 async function sendBLEData () {
   // TODO this needs to be generic
@@ -645,7 +678,7 @@ function createBodyText (service) {
         formCheckInput = `<div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="${
             characteristic.uuid}" onchange="enableNotification(this, '${
-            characteristic.uuid}', '${service.uuid}')" >
+            characteristic.uuid}', '${serviceUuid}')" >
             <label class="form-check-label" for="${
             characteristic.uuid}">Enable Notification</label>
           </div>`
@@ -686,6 +719,8 @@ function createGenericListener (charUuid) {
     logger(`Notification : ${uuids[charUuid]} : ${dataRecevied} `)
     // logger(`Notification : ${uuids[charUuid]} : ${event.target.value} `);
   }
+  deviceServer.setListener(serviceUuid, genericListener);
+  return genericListener;
 }
 async function enableNotification (checkbox, charUuid, serviceUuid) {
   if (checkbox.checked) {
