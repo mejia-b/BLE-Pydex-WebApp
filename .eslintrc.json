@@ -4,6 +4,7 @@
       "browser": true,
       "es6": true
     },
+    "extends": "standard",
     "rules": {
       // Possible Errors
       "no-await-in-loop": "error",
@@ -180,8 +181,8 @@
       "quote-props": ["error", "as-needed"],
       "quotes": ["error", "single"],
       "require-jsdoc": "off",
-      "semi": 0,
-      "semi-spacing": "error",
+      "semi": ["2", "always"],
+      "semi-spacing": 0,
       "sort-keys": "off",
       "sort-vars": "error",
       "space-before-blocks": "error",
