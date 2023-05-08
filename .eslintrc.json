@@ -4,6 +4,55 @@
         "semi": [0, "always"],
         "no-undef-init": [0,"off"],
         "no-undefined": [0,"off"],
-        "no-undef": [0,"off"]
+        "no-undef": [0,"off"],
+        "no-global-assign": [0,"off"]
+        
+    },
+    "globals":
+    {
+  
+        "OTAS_DISCONNECTED_STATE":"writable",
+        "OTAS_IDLE_STATE":"writable",
+        "OTAS_CONNECTED_STATE":"writable",
+        "OTAS_FILE_DISCOVER_STATE":"writable",
+        "OTAS_SEND_HEADER_STATE":"writable",
+        "OTAS_SEND_PUT_REQ_STATE":"writable",
+        "OTAS_ERASING_STATE":"writable",
+        "OTAS_SEND_FILE_STATE":"writable",
+        "OTAS_UPDATE_IN_PROGRESS_STATE":"writable",
+        "OTAS_SEND_VERIFY_REQ_STATE":"writable",
+        "OTAS_SEND_RESET_STATE":"writable",
+        "EVENT_COUNTER":"writable",
+        "OTAS_CURRENT_STATE":"writable",
+        "armPropDataCharacteristic":"writable", 
+        "armPropDataService":"writable",
+        "wdxsService":"writable",
+        "wdxsDeviceConfigCharacteristic":"writable",
+        "wdxsFileTransferControlCharacteristic":"writable", 
+        "wdxsFileTransferDataCharacteristic":"writable",
+        "wdsxFileAuthenticationCharacteristic":"writable",
+        "WDX_FLIST_HANDLE":"writable",
+        "WDX_FLIST_FORMAT_VER":"writable", 
+        "WDX_FLIST_HDR_SIZE":"writable",
+        "WDX_FLIST_RECORD_SIZE":"writable",
+        "DATC_WDXC_MAX_FILES":"writable",
+        "WDX_FTC_OP_NONE":"writable",     
+        "WDX_FTC_OP_GET_REQ":"writable",  
+        "WDX_FTC_OP_PUT_REQ":"writable",  
+        "WDX_FTC_OP_GET_RSP":"writable",  
+        "WDX_FTC_OP_PUT_RSP":"writable",  
+        "WDX_FTC_OP_ERASE_REQ":"writable",  
+        "WDX_FTC_OP_ERASE_RSP":"writable",  
+        "WDX_FTC_OP_VERIFY_REQ":"writable", 
+        "WDX_FTC_OP_VERIFY_RSP":"writable", 
+        "WDX_FTC_OP_ABORT":"writable",  
+        "WDX_FTC_OP_EOF":"writable",    
+        "WDX_DC_OP_SET":"writable",     
+        "WDX_DC_ID_DISCONNECT_AND_RESET":"writable",
+        "WDX_FILE_HANDLE":"writable",
+        "WDX_FILE_OFFSET":"writable",
+        "WDX_FILE_TYPE":"writable", 
+        "maxFileRecordLength":"writable"
+
     }
 }
