@@ -1,6 +1,7 @@
 {
     "extends": "standard",
     "rules": {
-        "semi": [0, "always"]
+        "semi": [0, "always"],
+        "no-undef": 0
     }
 }
