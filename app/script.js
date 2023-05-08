@@ -95,7 +95,74 @@ const uuids = {
 }
 
 // ---------- OTAS stuff ----------
-/*global ...*/
+/*global
+OTAS_DISCONNECTED_STATE,
+OTAS_IDLE_STATE,
+OTAS_CONNECTED_STATE,
+OTAS_FILE_DISCOVER_STATE,
+OTAS_SEND_HEADER_STATE,
+OTAS_SEND_PUT_REQ_STATE,
+OTAS_ERASING_STATE,
+OTAS_SEND_FILE_STATE,
+OTAS_UPDATE_IN_PROGRESS_STATE,
+OTAS_SEND_VERIFY_REQ_STATE,
+OTAS_SEND_RESET_STATE,
+EVENT_COUNTER,
+OTAS_CURRENT_STATE,
+armPropDataCharacteristic, 
+armPropDataService,
+wdxsService,
+wdxsDeviceConfigCharacteristic,
+wdxsFileTransferControlCharacteristic, 
+wdxsFileTransferDataCharacteristic,
+wdsxFileAuthenticationCharacteristic,
+WDX_FLIST_HANDLE,
+WDX_FLIST_FORMAT_VER, 
+WDX_FLIST_HDR_SIZE,
+WDX_FLIST_RECORD_SIZE,
+DATC_WDXC_MAX_FILES,
+WDX_FTC_OP_NONE,     
+WDX_FTC_OP_GET_REQ,  
+WDX_FTC_OP_PUT_REQ,  
+WDX_FTC_OP_GET_RSP,  
+WDX_FTC_OP_PUT_RSP,  
+WDX_FTC_OP_ERASE_REQ,  
+WDX_FTC_OP_ERASE_RSP,  
+WDX_FTC_OP_VERIFY_REQ, 
+WDX_FTC_OP_VERIFY_RSP, 
+WDX_FTC_OP_ABORT,  
+WDX_FTC_OP_EOF,    
+WDX_DC_OP_SET,     
+WDX_DC_ID_DISCONNECT_AND_RESET,
+WDX_FTC_OP_NONE,
+WDX_FTC_OP_GET_REQ,
+WDX_FTC_OP_PUT_REQ,
+WDX_FTC_OP_GET_RSP,
+WDX_FTC_OP_PUT_RSP,
+WDX_FTC_OP_ERASE_REQ,
+WDX_FTC_OP_ERASE_RSP,
+WDX_FTC_OP_VERIFY_REQ,
+WDX_FTC_OP_VERIFY_RSP,
+WDX_FTC_OP_ABORT,
+WDX_FTC_OP_EOF,
+WDX_DC_OP_SET,
+WDX_DC_ID_DISCONNECT_AND_RESE,
+WDX_FILE_HANDLE,
+WDX_FILE_HANDLE,
+WDX_FILE_HANDLE,
+WDX_FILE_OFFSET,
+WDX_FILE_OFFSET,
+WDX_FILE_OFFSET,
+WDX_FILE_OFFSET,
+WDX_FILE_OFFSET,
+WDX_FILE_TYPE, 
+WDX_FILE_TYPE,
+maxFileRecordLength,
+maxFileRecordLength,
+maxFileRecordLength,
+maxFileRecordLength,
+maxFileRecordLength,
+*/
 OTAS_DISCONNECTED_STATE = 0
 OTAS_IDLE_STATE = 1
 OTAS_CONNECTED_STATE = 2
@@ -108,7 +175,7 @@ OTAS_UPDATE_IN_PROGRESS_STATE = 8
 OTAS_SEND_VERIFY_REQ_STATE = 9
 OTAS_SEND_RESET_STATE = 10
 EVENT_COUNTER = 0
-/*global ...*/
+
 OTAS_CURRENT_STATE = OTAS_DISCONNECTED_STATE
 let armPropDataCharacteristic = null
 let armPropDataService = null
@@ -119,17 +186,17 @@ wdxsFileTransferDataCharacteristic = null
 wdsxFileAuthenticationCharacteristic = null
 // clang-format-off
 // WDXS File List Configuration
-/*global ...*/
+
 WDX_FLIST_HANDLE = 0 // brief File List handle */
 WDX_FLIST_FORMAT_VER = 1 // brief File List version */
 WDX_FLIST_HDR_SIZE = 7 // brief File List header length */
 WDX_FLIST_RECORD_SIZE = 40 // brief File List record length */
 
 // Size of WDXC file discovery dataset
-/*global ...*/
+
 DATC_WDXC_MAX_FILES = 4
 // File Transfer Control Characteristic Operations
-/*global ...*/
+
 WDX_FTC_OP_NONE = new Uint8Array(1)
 WDX_FTC_OP_GET_REQ = new Uint8Array(1)
 WDX_FTC_OP_PUT_REQ = new Uint8Array(1)
@@ -166,10 +233,10 @@ WDX_FILE_OFFSET[2] = 0
 WDX_FILE_OFFSET[3] = 0
 WDX_FILE_TYPE = new Uint8Array(1)
 WDX_FILE_TYPE[0] = 0
-/*global ...*/
+
 maxFileRecordLength = new Uint8Array(4)
 // set maxFileRecordLength to the value ((WDX_FLIST_RECORD_SIZE * DATC_WDXC_MAX_FILES) + WDX_FLIST_HDR_SIZE) in little endian
-/*global ...*/
+
 maxFileRecordLength[0] = 167
 maxFileRecordLength[1] = 0
 maxFileRecordLength[2] = 0
