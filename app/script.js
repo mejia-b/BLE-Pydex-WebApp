@@ -95,7 +95,7 @@ const uuids = {
 }
 
 // ---------- OTAS stuff ----------
-// clang-format off
+/*global ...*/
 OTAS_DISCONNECTED_STATE = 0
 OTAS_IDLE_STATE = 1
 OTAS_CONNECTED_STATE = 2
@@ -108,7 +108,7 @@ OTAS_UPDATE_IN_PROGRESS_STATE = 8
 OTAS_SEND_VERIFY_REQ_STATE = 9
 OTAS_SEND_RESET_STATE = 10
 EVENT_COUNTER = 0
-
+/*global ...*/
 OTAS_CURRENT_STATE = OTAS_DISCONNECTED_STATE
 let armPropDataCharacteristic = null
 let armPropDataService = null
@@ -119,14 +119,17 @@ wdxsFileTransferDataCharacteristic = null
 wdsxFileAuthenticationCharacteristic = null
 // clang-format-off
 // WDXS File List Configuration
+/*global ...*/
 WDX_FLIST_HANDLE = 0 // brief File List handle */
 WDX_FLIST_FORMAT_VER = 1 // brief File List version */
 WDX_FLIST_HDR_SIZE = 7 // brief File List header length */
 WDX_FLIST_RECORD_SIZE = 40 // brief File List record length */
 
 // Size of WDXC file discovery dataset
+/*global ...*/
 DATC_WDXC_MAX_FILES = 4
 // File Transfer Control Characteristic Operations
+/*global ...*/
 WDX_FTC_OP_NONE = new Uint8Array(1)
 WDX_FTC_OP_GET_REQ = new Uint8Array(1)
 WDX_FTC_OP_PUT_REQ = new Uint8Array(1)
@@ -153,22 +156,20 @@ WDX_FTC_OP_ABORT[0] = 9
 WDX_FTC_OP_EOF[0] = 10
 WDX_DC_OP_SET[0] = 2
 WDX_DC_ID_DISCONNECT_AND_RESET[0] = 37
-
 WDX_FILE_HANDLE = new Uint8Array(2)
 WDX_FILE_HANDLE[0] = 0
 WDX_FILE_HANDLE[1] = 0
-
 WDX_FILE_OFFSET = new Uint8Array(4)
 WDX_FILE_OFFSET[0] = 0
 WDX_FILE_OFFSET[1] = 0
 WDX_FILE_OFFSET[2] = 0
 WDX_FILE_OFFSET[3] = 0
-
 WDX_FILE_TYPE = new Uint8Array(1)
 WDX_FILE_TYPE[0] = 0
-
+/*global ...*/
 maxFileRecordLength = new Uint8Array(4)
 // set maxFileRecordLength to the value ((WDX_FLIST_RECORD_SIZE * DATC_WDXC_MAX_FILES) + WDX_FLIST_HDR_SIZE) in little endian
+/*global ...*/
 maxFileRecordLength[0] = 167
 maxFileRecordLength[1] = 0
 maxFileRecordLength[2] = 0
