@@ -1,4 +1,4 @@
-// super linter test #2
+
 // ---------- HTML elements ----------
 const deviceNameInput = document.getElementById('deviceNameInput')
 const stringToSend = document.getElementById('stringToSendInput')
@@ -12,14 +12,9 @@ connectButton.addEventListener('click', BLEManager)
 sendButton.addEventListener('click', sendBLEData)
 startUpdateButton.addEventListener('click', startUpdate)
 
-crc32bytes = new Uint8Array(4)
-fileSize = 0
-fileBuffer = []
-adrdressNum = 0
-const charArray = []
-const serviceArray = []
-charCallBackCount = 0
-charCallBacks = [10]
+let crc32bytes = new Uint8Array(4)
+let fileSize = 0
+let fileBuffer = []
 // ---------- File chooser ----------
 const choseFileButton = document.getElementById('choseFileButton')
 choseFileButton.addEventListener('change', function () {
@@ -31,54 +26,51 @@ choseFileButton.addEventListener('change', function () {
 const reader = new FileReader()
 
 // ---------- BLE objects ----------
-class bleCharacteristic {
-  constructor (uuid, index, properties) {
-    this.uuid = uuid
-    this.index = index
-    this.properties = properties
+class Services {
+  constructor () {
+    this.services = {}
   }
 
-class bleService {
-  constructor (uuid, index) {
-    this.uuid = uuid
-    this.index = index
-    this.characteristics = []
+  addService (serviceUuid, serviceObject) {
+    this.services[serviceUuid] = {
+      object: serviceObject,
+      characteristics: [],
+      listener: null
+    }
   }
 
-  addCharacteristic(serviceUuid, charUuid, charPorperties, charObject) {
+  addCharacteristic (serviceUuid, charUuid, charPorperties, charObject) {
     this.services[serviceUuid].characteristics.push({
       uuid: charUuid,
       properties: charPorperties,
       object: charObject
-    });
+    })
   }
 
-  setListener(serviceUuid, listener) {
-    this.services[serviceUuid].listener = listener;
+  setListener (serviceUuid, listener) {
+    this.services[serviceUuid].listener = listener
   }
 
-  getService(serviceUuid) {
-    return this.services[serviceUuid];
+  getService (serviceUuid) {
+    return this.services[serviceUuid]
   }
 
-  getCharacteristic(serviceUuid, charUuid) {
-    return this.services[serviceUuid].characteristics.find(c => c.uuid === charUuid);
+  getCharacteristic (serviceUuid, charUuid) {
+    return this.services[serviceUuid].characteristics.find(c => c.uuid === charUuid)
   }
 
-  getListener(serviceUuid) {
-    return this.services[serviceUuid].listener;
+  getListener (serviceUuid) {
+    return this.services[serviceUuid].listener
   }
 
-  clear() {
-    this.services = {};
+  clear () {
+    this.services = {}
   }
 }
-
-const services = {}
-const enabledNotifications = new Set()
+let enabledNotifications = new Set()
 let connectedDevice = null
 let device = null
-
+let deviceServer = new Services()
 // Here you can add more UUIDs per your application needs
 const uuids = {
   '00001800-0000-1000-8000-00805f9b34fb': 'Generic Access Profile',
@@ -100,51 +92,52 @@ const uuids = {
 }
 
 // ---------- OTAS stuff ----------
-// clang-format off
-OTAS_DISCONNECTED_STATE = 0
-OTAS_IDLE_STATE = 1
-OTAS_CONNECTED_STATE = 2
-OTAS_FILE_DISCOVER_STATE = 3
-OTAS_SEND_HEADER_STATE = 4
-OTAS_SEND_PUT_REQ_STATE = 5
-OTAS_ERASING_STATE = 6
-OTAS_SEND_FILE_STATE = 7
-OTAS_UPDATE_IN_PROGRESS_STATE = 8
-OTAS_SEND_VERIFY_REQ_STATE = 9
-OTAS_SEND_RESET_STATE = 10
-EVENT_COUNTER = 0
-
-OTAS_CURRENT_STATE = OTAS_DISCONNECTED_STATE
+const OTAS_DISCONNECTED_STATE = 0
+const OTAS_IDLE_STATE = 1
+const OTAS_CONNECTED_STATE = 2
+const OTAS_FILE_DISCOVER_STATE = 3
+const OTAS_SEND_HEADER_STATE = 4
+const OTAS_SEND_PUT_REQ_STATE = 5
+const OTAS_ERASING_STATE = 6
+const OTAS_SEND_FILE_STATE = 7
+const OTAS_UPDATE_IN_PROGRESS_STATE = 8
+const OTAS_SEND_VERIFY_REQ_STATE = 9
+const OTAS_SEND_RESET_STATE = 10
+let EVENT_COUNTER = 0
+let OTAS_CURRENT_STATE = OTAS_DISCONNECTED_STATE
 let armPropDataCharacteristic = null
 let armPropDataService = null
 let wdxsService = null
-wdxsDeviceConfigCharacteristic = null
-wdxsFileTransferControlCharacteristic = null
-wdxsFileTransferDataCharacteristic = null
-wdsxFileAuthenticationCharacteristic = null
+let wdxsDeviceConfigCharacteristic = null
+let wdxsFileTransferControlCharacteristic = null
+let wdxsFileTransferDataCharacteristic = null
+let wdsxFileAuthenticationCharacteristic = null
 // clang-format-off
 // WDXS File List Configuration
-WDX_FLIST_HANDLE = 0 // brief File List handle */
-WDX_FLIST_FORMAT_VER = 1 // brief File List version */
-WDX_FLIST_HDR_SIZE = 7 // brief File List header length */
-WDX_FLIST_RECORD_SIZE = 40 // brief File List record length */
+
+// const WDX_FLIST_HANDLE = 0 // brief File List handle */
+// const WDX_FLIST_FORMAT_VER = 1 // brief File List version */
+// const WDX_FLIST_HDR_SIZE = 7 // brief File List header length */
+// const WDX_FLIST_RECORD_SIZE = 40 // brief File List record length */
 
 // Size of WDXC file discovery dataset
-DATC_WDXC_MAX_FILES = 4
+
+// const DATC_WDXC_MAX_FILES = 4
 // File Transfer Control Characteristic Operations
-WDX_FTC_OP_NONE = new Uint8Array(1)
-WDX_FTC_OP_GET_REQ = new Uint8Array(1)
-WDX_FTC_OP_PUT_REQ = new Uint8Array(1)
-WDX_FTC_OP_GET_RSP = new Uint8Array(1)
-WDX_FTC_OP_PUT_RSP = new Uint8Array(1)
-WDX_FTC_OP_ERASE_REQ = new Uint8Array(1)
-WDX_FTC_OP_ERASE_RSP = new Uint8Array(1)
-WDX_FTC_OP_VERIFY_REQ = new Uint8Array(1)
-WDX_FTC_OP_VERIFY_RSP = new Uint8Array(1)
-WDX_FTC_OP_ABORT = new Uint8Array(1)
-WDX_FTC_OP_EOF = new Uint8Array(1)
-WDX_DC_OP_SET = new Uint8Array(1)
-WDX_DC_ID_DISCONNECT_AND_RESET = new Uint8Array(1)
+
+const WDX_FTC_OP_NONE = new Uint8Array(1)
+const WDX_FTC_OP_GET_REQ = new Uint8Array(1)
+const WDX_FTC_OP_PUT_REQ = new Uint8Array(1)
+const WDX_FTC_OP_GET_RSP = new Uint8Array(1)
+const WDX_FTC_OP_PUT_RSP = new Uint8Array(1)
+const WDX_FTC_OP_ERASE_REQ = new Uint8Array(1)
+const WDX_FTC_OP_ERASE_RSP = new Uint8Array(1)
+const WDX_FTC_OP_VERIFY_REQ = new Uint8Array(1)
+const WDX_FTC_OP_VERIFY_RSP = new Uint8Array(1)
+const WDX_FTC_OP_ABORT = new Uint8Array(1)
+const WDX_FTC_OP_EOF = new Uint8Array(1)
+const WDX_DC_OP_SET = new Uint8Array(1)
+const WDX_DC_ID_DISCONNECT_AND_RESET = new Uint8Array(1)
 WDX_FTC_OP_NONE[0] = 0
 WDX_FTC_OP_GET_REQ[0] = 1
 WDX_FTC_OP_PUT_REQ[0] = 3
@@ -159,20 +152,20 @@ WDX_FTC_OP_EOF[0] = 10
 WDX_DC_OP_SET[0] = 2
 WDX_DC_ID_DISCONNECT_AND_RESET[0] = 37
 
-WDX_FILE_HANDLE = new Uint8Array(2)
+const WDX_FILE_HANDLE = new Uint8Array(2)
 WDX_FILE_HANDLE[0] = 0
 WDX_FILE_HANDLE[1] = 0
 
-WDX_FILE_OFFSET = new Uint8Array(4)
+const WDX_FILE_OFFSET = new Uint8Array(4)
 WDX_FILE_OFFSET[0] = 0
 WDX_FILE_OFFSET[1] = 0
 WDX_FILE_OFFSET[2] = 0
 WDX_FILE_OFFSET[3] = 0
 
-WDX_FILE_TYPE = new Uint8Array(1)
+const WDX_FILE_TYPE = new Uint8Array(1)
 WDX_FILE_TYPE[0] = 0
 
-maxFileRecordLength = new Uint8Array(4)
+const maxFileRecordLength = new Uint8Array(4)
 // set maxFileRecordLength to the value ((WDX_FLIST_RECORD_SIZE * DATC_WDXC_MAX_FILES) + WDX_FLIST_HDR_SIZE) in little endian
 maxFileRecordLength[0] = 167
 maxFileRecordLength[1] = 0
@@ -207,7 +200,7 @@ reader.onload = function () {
 // characteristics
 async function BLEManager () {
   try {
-    if (deviceNameInput.value == '') {
+    if (deviceNameInput.value === '') {
       device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
         //   filters: [{
@@ -230,6 +223,11 @@ async function BLEManager () {
     }
 
     connectedDevice = await device.gatt.connect()
+    try {
+      device.addEventListener('gattserverdisconnected', onDisconnected)
+    } catch (error) {
+      loggerError(error)
+    }
     // TODO: Update connection status
     logger('Connected to ' + device.name)
 
@@ -238,24 +236,19 @@ async function BLEManager () {
       const primaryServices = await connectedDevice.getPrimaryServices()
 
       logger('Getting Characteristics...')
+
       for (const service of primaryServices) {
         const characteristics = await service.getCharacteristics()
         const serviceUuid = service.uuid
-        services[serviceUuid] = {
-          uuid: serviceUuid,
-          characteristics: [],
-          object: service
-        }
+        deviceServer.addService(serviceUuid, service)
         for (const characteristic of characteristics) {
           const properties = getSupportedProperties(characteristic)
-          services[serviceUuid].characteristics.push(
-            { uuid: characteristic.uuid, properties, object: characteristic })
+          deviceServer.addCharacteristic(serviceUuid, characteristic.uuid, properties, characteristic)
         }
       }
-      console.log(services)
-      createAccordion(services)
+      createAccordion(deviceServer)
     } catch (error) {
-      loggerError(error)
+      loggerError('here ' + error)
     }
 
     await checkIfConnectedToOTAS()
@@ -263,13 +256,46 @@ async function BLEManager () {
     loggerError(error)
   }
 }
-function onDisconnected(event) {
+function onDisconnected (event) {
   // TODO : lots of variable cleanup
-  logger('> Bluetooth Device disconnected');
-  clearAccordion('accordionExample');
-  removeAllEventListeners(deviceServer);
-  resetGlobals();
+  logger('> Bluetooth Device disconnected')
+  clearAccordion('accordionExample')
+  removeAllEventListeners(deviceServer)
+  resetGlobals()
 
+  // OTAS rellated
+  OTAUpdateCard.setAttribute('hidden', true)
+  document.querySelector('.progress-bar').setAttribute('aria-valuenow', 0)
+  document.querySelector('.progress-bar').style.width = 0 + '%'
+  document.querySelector('.blockquote p').textContent = 0 + '% Uploaded'
+}
+async function removeAllEventListeners (servicesInstance) {
+  for (const serviceUuid in servicesInstance.services) {
+    const service = servicesInstance.getService(serviceUuid)
+    for (const characteristic of service.characteristics) {
+      if (enabledNotifications.has(characteristic.uuid)) {
+        const char = characteristic.object
+        const genericListener = service.listener
+        char.removeEventListener('characteristicvaluechanged', genericListener)
+        await char.stopNotifications()
+        logger('Notification disabled for ' + uuids[characteristic.uuid])
+        enabledNotifications.delete(characteristic.uuid)
+      }
+    }
+  }
+  servicesInstance.clear()
+}
+
+function resetGlobals () {
+  crc32bytes = new Uint8Array(4)
+  fileSize = 0
+  fileBuffer = []
+
+  enabledNotifications = new Set()
+  connectedDevice = null
+  device = null
+  deviceServer = new Services()
+}
 async function sendBLEData () {
   // TODO this needs to be generic
   logger('Sending: ')
@@ -453,6 +479,7 @@ function handleNotifications_wdxs_otas () {
       logger('OTAS_SEND_VERIFY_REQ_STATE')
       OTAS_CURRENT_STATE++
       sendVerifyRequest()
+      // TODO : only sent reset request if verify state is success == 0
       break
 
     case OTAS_SEND_RESET_STATE:
@@ -474,8 +501,6 @@ function handleNotifications_wdxs_otas () {
 
 async function sendOtasHeader () {
   const packetToSend = new Uint8Array(8)
-
-  const fileSizeBytes = new Uint8Array(4)
 
   packetToSend[3] = (fileSize >> 24) & 0xff
   packetToSend[2] = (fileSize >> 16) & 0xff
@@ -527,26 +552,21 @@ async function sendPutRequest () {
 }
 
 async function sendFile () {
-  // send fileBuffer to WDX in chunks of 224 bytes
   const chunkSize = 220
   let adrdressNum = 0
   const addressBytes = new Uint8Array(4)
-  // /const fileBuffer = reader.result;
-  const chunkCount = Math.ceil(fileBuffer.length / chunkSize)
-  // TODO : calculate how many bytes are left to send after chunkCount is done
-  // and send the remaining bytes.
-  // set addressNum into addressBytes in little endian format
+
   addressBytes[0] = 0
   addressBytes[1] = 0
   addressBytes[2] = 0
   addressBytes[3] = 0
-  exit = false
+  let exit = false
 
-  //  while (adrdressNum < fileBuffer.length) {
-  var intervalId = setInterval(function () {
+  const intervalId = setInterval(function () {
+    let packetToSend = null
     if ((adrdressNum + chunkSize) > fileSize) { // last chunk
       // send remaining bytes
-      var packetToSend =
+      packetToSend =
           new Uint8Array(fileSize - adrdressNum + addressBytes.length)
       packetToSend.set(addressBytes, 0)
       packetToSend.set(
@@ -557,7 +577,7 @@ async function sendFile () {
       exit = true
     } else {
       // send chunk of file starting at sendAddress
-      var packetToSend = new Uint8Array(chunkSize + addressBytes.length)
+      packetToSend = new Uint8Array(chunkSize + addressBytes.length)
       packetToSend.set(addressBytes, 0)
       packetToSend.set(
         fileBuffer.slice(adrdressNum, adrdressNum + chunkSize),
@@ -571,12 +591,17 @@ async function sendFile () {
     addressBytes[1] = (adrdressNum >> 8) & 0xff
     addressBytes[2] = (adrdressNum >> 16) & 0xff
     addressBytes[3] = (adrdressNum >> 24) & 0xff
+
+    // Update progress bar and blockquote element
+    const progress = (adrdressNum / fileSize) * 100
+    document.querySelector('.progress-bar').setAttribute('aria-valuenow', progress)
+    document.querySelector('.progress-bar').style.width = progress + '%'
+    document.querySelector('.blockquote p').textContent = progress.toFixed(0) + '% Uploaded'
+
     if (exit) {
       clearInterval(intervalId)
     }
   }, 10)
-
-  // handleNotifications_wdxs_otas();
 }
 
 async function sendVerifyRequest () {
@@ -597,17 +622,14 @@ async function sendResetState () {
   sendWdxsData(wdxsDeviceConfigCharacteristic, packetToSend, true)
   logger('Sent packet to reset state' + packetToSend)
 }
-async function sendPacketFunction () {
-  const newFileHandle = new Uint8Array(2)
-  newFileHandle[0] = 1
-  newFileHandle[1] = 0
-  const packetToSend = new Uint8Array(3)
-  packetToSend.set(WDX_FTC_OP_VERIFY_REQ, 0)
-  packetToSend.set(newFileHandle, 1)
-  sendWdxsData(wdxsFileTransferControlCharacteristic, packetToSend, true)
-  logger('Sent packet to verify file' + packetToSend)
-}
 
+function clearAccordion (accordionId) {
+  const accordion = document.querySelector('#' + accordionId)
+  const items = accordion.querySelectorAll('.accordion-item')
+  items.forEach(function (item) {
+    item.remove()
+  })
+}
 function createAccordionItem (headerId, bodyId, headerText, bodyText) {
   const newItem = `
   <div class="accordion-item">
@@ -627,29 +649,34 @@ function createAccordionItem (headerId, bodyId, headerText, bodyText) {
   return newItem
 }
 
-function createAccordion (services) {
+function createAccordion (servicesInstance) {
   const accordion = document.getElementById('accordionExample')
   accordion.innerHTML = ''
-  for (const serviceUuid in services) {
-    const service = services[serviceUuid]
-    let headerText = 'Service : ' + uuids[service.uuid] || service.uuid
-    if (!uuids[service.uuid]) {
-      headerText = 'Service : ' + service.uuid
-    }
-    const bodyText = createBodyText(service)
+  for (const serviceUuid in servicesInstance.services) {
+    const service = servicesInstance.getService(serviceUuid)
+    const headerText = 'Service : ' + (uuids[serviceUuid] || serviceUuid)
+    const bodyText = createBodyText(serviceUuid)
     const newAccordionItem = createAccordionItem(
-      'heading' + service.uuid, 'collapse' + service.uuid, headerText,
+      'heading' + serviceUuid, 'collapse' + serviceUuid, headerText,
       bodyText)
     accordion.insertAdjacentHTML('beforeend', newAccordionItem)
   }
 }
 
-function createBodyText (service) {
+function createBodyText (serviceUuid) {
   let bodyText = ''
+  const service = deviceServer.getService(serviceUuid)
   for (const characteristic of service.characteristics) {
-    const serviceName = uuids[service.uuid] || service.uuid
-    const characteristicName = uuids[characteristic.uuid] || characteristic.uuid
-    const properties = characteristic.properties.split(',')
+    const characteristicName = (uuids[characteristic.uuid] || characteristic.uuid)
+
+    if (characteristic.properties) {
+      var properties = characteristic.properties.split(',')
+      // logger('properties: ' + properties)
+      // rest of the code
+    } else {
+      logger('something went wrong: ' + characteristic.properties)
+      // handle the case where characteristic.properties is undefined
+    }
     let badges = ''
     let formCheckInput = ''
     let button = ''
@@ -665,11 +692,11 @@ function createBodyText (service) {
           badges += `<span class="badge bg-secondary ms-1">${
               property.replace('[', '').replace(']', '')}</span>`
         }
-        const inputId = `input-${service.uuid}-${characteristic.uuid}`
-        const buttonId = `button-${service.uuid}-${characteristic.uuid}`
+        const inputId = `input-${serviceUuid}-${characteristic.uuid}`
+        const buttonId = `button-${serviceUuid}-${characteristic.uuid}`
         button = `<button type="button" class="btn btn-primary ms-1" id="${
             buttonId}" onclick="writeButtonCallback('${inputId}', '${
-            service.uuid}', '${characteristic.uuid}')">write</button>`
+              serviceUuid}', '${characteristic.uuid}')">write</button>`
         formControl = `<input class="form-control ms-1" id="${
             inputId}" placeholder="string to send">`
       } else if (property.includes('NOTIFY')) {
@@ -700,10 +727,7 @@ async function writeButtonCallback (inputId, serviceUuid, characteristicUuid) {
   logger(`Input value: ${inputValue}, Service UUID: ${
       serviceUuid}, Characteristic UUID: ${characteristicUuid}`)
   try {
-    const characteristic =
-        services[serviceUuid]
-          .characteristics.find(c => c.uuid === characteristicUuid)
-          .object
+    const characteristic = deviceServer.getCharacteristic(serviceUuid, characteristicUuid).object
     const uint8array = new TextEncoder().encode(inputValue)
     await characteristic.writeValueWithoutResponse(uint8array)
     logger('Value has been written')
@@ -711,25 +735,22 @@ async function writeButtonCallback (inputId, serviceUuid, characteristicUuid) {
     loggerError(error)
   }
 }
-function createGenericListener (charUuid) {
-  return function (event) {
+function createGenericListener (charUuid, serviceUuid) {
+  const genericListener = function (event) {
     // handle the event here
     const value = event.target.value
     const dataRecevied = new TextDecoder().decode(value)
     logger(`Notification : ${uuids[charUuid]} : ${dataRecevied} `)
-    // logger(`Notification : ${uuids[charUuid]} : ${event.target.value} `);
   }
-  deviceServer.setListener(serviceUuid, genericListener);
-  return genericListener;
+  deviceServer.setListener(serviceUuid, genericListener)
+  return genericListener
 }
 async function enableNotification (checkbox, charUuid, serviceUuid) {
   if (checkbox.checked) {
     if (!enabledNotifications.has(charUuid)) {
-      const service = services[serviceUuid].object
-      const char = services[serviceUuid]
-        .characteristics.find(c => c.uuid === charUuid)
-        .object
-      const genericListener = createGenericListener(charUuid)
+      const service = deviceServer.getService(serviceUuid).object
+      const char = deviceServer.getCharacteristic(serviceUuid, charUuid).object
+      const genericListener = createGenericListener(charUuid, serviceUuid)
       char.addEventListener('characteristicvaluechanged', genericListener)
       await char.startNotifications()
       logger('Notification enabled for ' + uuids[charUuid])
@@ -738,8 +759,17 @@ async function enableNotification (checkbox, charUuid, serviceUuid) {
       logger('Notification already enabled for ' + uuids[charUuid])
     }
   } else {
-    // Checkbox is not checked
-    logger('Checkbox with ID ' + charUuid + ' is not checked!')
+    // remove eventlistener
+    if (enabledNotifications.has(charUuid)) {
+      const char = deviceServer.getCharacteristic(serviceUuid, charUuid).object
+      const genericListener = deviceServer.getListener(serviceUuid)
+      char.removeEventListener('characteristicvaluechanged', genericListener)
+      await char.stopNotifications()
+      logger('Notification disabled for ' + uuids[charUuid])
+      enabledNotifications.delete(charUuid)
+    } else {
+      logger('Notification already disabled for ' + uuids[charUuid])
+    }
   }
 }
 function addNewAccordionItems (myStructArray) {
@@ -752,12 +782,6 @@ function addNewAccordionItems (myStructArray) {
     const bodyText = item.index
     const newItem = createAccordionItem(headerId, bodyId, headerText, bodyText)
     accordion.insertAdjacentHTML('beforeend', newItem)
-    const currentIndex = charCallBackCount
-    charCallBacks[currentIndex] = document.getElementById(bodyId)
-    charCallBacks[currentIndex].addEventListener('click', () => {
-      buttonCB(currentIndex)
-    })
-    charCallBackCount++
   })
 }
 function buttonCB (id) {
