@@ -181,7 +181,7 @@
       "quotes": ["error", "single"],
       "require-jsdoc": "off",
       "semi": ["error", "never"],
-      "semi-spacing": "error",
+      "semi-spacing": "never",
       "sort-keys": "off",
       "sort-vars": "error",
       "space-before-blocks": "error",
