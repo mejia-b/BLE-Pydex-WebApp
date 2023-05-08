@@ -2,6 +2,7 @@
     "extends": "standard",
     "rules": {
         "semi": [0, "always"],
-        "no-undef": 0
+        "no-undef-init": "off",
+        "no-undefined": "off"
     }
 }
